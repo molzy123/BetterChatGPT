@@ -52,7 +52,11 @@ export const getChatCompletion = async (
       max_tokens: undefined,
     }),
   });
-  if (!response.ok) throw new Error(await response.text());
+  if (!response.ok) {
+    const error = await  response.json()
+    error.status = response.status
+    throw new Error(JSON.stringify(error));
+  }
 
   const data = await response.json();
   return data;
@@ -106,33 +110,12 @@ export const getChatCompletionStream = async (
       stream: true,
     }),
   });
-  if (response.status === 404 || response.status === 405) {
-    const text = await response.text();
 
-    if (text.includes('model_not_found')) {
-      throw new Error(
-        text +
-          '\nMessage from Better ChatGPT:\nPlease ensure that you have access to the GPT-4 API!'
-      );
-    } else {
-      throw new Error(
-        'Message from Better ChatGPT:\nInvalid API endpoint! We recommend you to check your free API endpoint.'
-      );
-    }
+  if (!response.ok) {
+    const error = await  response.json()
+    error.status = response.status
+    throw new Error(JSON.stringify(error));
   }
-
-  if (response.status === 429 || !response.ok) {
-    const text = await response.text();
-    let error = text;
-    if (text.includes('insufficient_quota')) {
-      error +=
-        '\nMessage from Better ChatGPT:\nWe recommend changing your API endpoint or API key';
-    } else if (response.status === 429) {
-      error += '\nRate limited!';
-    }
-    throw new Error(error);
-  }
-
   const stream = response.body;
   return stream;
 };
