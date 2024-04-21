@@ -17,14 +17,40 @@ export const getToken = async (username:string,password:string ) => {
       const error = await  response.json()
       error.status = response.status
       throw new Error(JSON.stringify(error));
+    }else{
+      const result = await response.json();
+      return result.access_token;
     }
-
-    const result = await response.json();
-    return result.access_token;
   } catch (error) {
     handleErrorStatus(error)
+    return "";
   }
 };
+
+export const registerUser = async (username:string,password:string,email:string) => {
+    try {
+      console.log(username,password,email)
+      const response = await fetch('http://127.0.0.1:8000/user/', {
+        method: 'POST',
+        headers:{
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          "username":username,
+          "password":password,
+          "email":email
+        }),
+      });
+      if(!response.ok){
+        const error = await  response.json()
+        error.status = response.status
+        throw new Error(JSON.stringify(error));
+      }
+      return response.json();
+    } catch (error) {
+        handleErrorStatus(error)
+    }
+}
 
 
 export const getSelfInfo = async (token: string) => {

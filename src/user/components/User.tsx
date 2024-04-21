@@ -5,15 +5,16 @@ import PersonIcon from '@icon/PersonIcon';
 import ApiMenu from '@components/ApiMenu';
 import UserLogin from '@components/UserMenu';
 import useStore from '@store/store';
+import { Locator } from '@src/common/data/Locator';
+import { UserService } from '@src/user/mgr/UserService';
 
 const User = () => {
   const { t } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const userToken = useRef<String>();
-
+  const userService = Locator.fetch(UserService)
   useEffect(() => {
-    userToken.current = useStore.getState().userToken;
-
+    userToken.current = userService.accessToken;
     useStore.subscribe((state) => {
       if(state.userToken == "")
       {
@@ -41,6 +42,7 @@ const User = () => {
       >
         <PersonIcon />
         {"用户"}
+        {"次数："}
       </a>
       {isModalOpen && <UserLogin setIsModalOpen={setIsModalOpen} />}
     </>
