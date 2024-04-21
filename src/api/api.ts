@@ -1,11 +1,12 @@
 import { ShareGPTSubmitBodyInterface } from '@type/api';
 import { ConfigInterface, MessageInterface, ModelOptions } from '@type/chat';
 import { isAzureEndpoint } from '@utils/api';
+import { IAiChatMessageDef, IAiConfigDef } from '@src/ai/data/AIDef';
 
 export const getChatCompletion = async (
   endpoint: string,
   messages: MessageInterface[],
-  config: ConfigInterface,
+  config: IAiConfigDef,
   apiKey?: string,
   customHeaders?: Record<string, string>
 ) => {
@@ -64,8 +65,8 @@ export const getChatCompletion = async (
 
 export const getChatCompletionStream = async (
   endpoint: string,
-  messages: MessageInterface[],
-  config: ConfigInterface,
+  messages: IAiChatMessageDef[],
+  config: IAiConfigDef,
   apiKey?: string,
   customHeaders?: Record<string, string>
 ) => {

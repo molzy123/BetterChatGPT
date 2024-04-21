@@ -7,78 +7,55 @@ import React, {
 
 import ReactMarkdown from 'react-markdown';
 import { CodeProps, ReactMarkdownProps } from 'react-markdown/lib/ast-to-react';
-
 import rehypeKatex from 'rehype-katex';
 import rehypeHighlight from 'rehype-highlight';
 import remarkMath from 'remark-math';
 import remarkGfm from 'remark-gfm';
 import useStore from '@store/store';
-
 import TickIcon from '@icon/TickIcon';
 import CrossIcon from '@icon/CrossIcon';
-
 import useSubmit from '@hooks/useSubmit';
-
-import { ChatInterface } from '@type/chat';
-
 import { codeLanguageSubset } from '@constants/chat';
-
-import RefreshButton from './Button/RefreshButton';
-import UpButton from './Button/UpButton';
-import DownButton from './Button/DownButton';
-import CopyButton from './Button/CopyButton';
-import EditButton from './Button/EditButton';
-import DeleteButton from './Button/DeleteButton';
-import MarkdownModeButton from './Button/MarkdownModeButton';
+import UpButton from '../button/UpButton';
+import DownButton from '../button/DownButton';
+import CopyButton from '../button/CopyButton';
+import EditButton from '../button/EditButton';
+import DeleteButton from '../button/DeleteButton';
+import MarkdownModeButton from '../button/MarkdownModeButton';
 
 import CodeBlock from '../CodeBlock';
+import { AiChatMessage } from '@src/ai/data/AiChatMessage';
+import { Locator } from '@src/common/data/Locator';
+import { AIService } from '@src/ai/mgr/AIService';
+import RefreshButton from '../button/RefreshButton';
+import { useBindObjectEvent } from '@src/common/Event/WeakObjectEventService';
 
 const ContentView = memo(
   ({
-    role,
-    content,
+    message,
+    index,
     setIsEdit,
-    messageIndex,
   }: {
-    role: string;
-    content: string;
+    index : number;
+    message:AiChatMessage;
     setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
-    messageIndex: number;
   }) => {
     const { handleSubmit } = useSubmit();
-
     const [isDelete, setIsDelete] = useState<boolean>(false);
-
-    const currentChatIndex = useStore((state) => state.currentChatIndex);
-    const setChats = useStore((state) => state.setChats);
-    const lastMessageIndex = useStore((state) =>
-      state.chats ? state.chats[state.currentChatIndex].messages.length - 1 : 0
-    );
     const inlineLatex = useStore((state) => state.inlineLatex);
     const markdownMode = useStore((state) => state.markdownMode);
-
+    const aiService = Locator.fetch(AIService)
     const handleDelete = () => {
-      const updatedChats: ChatInterface[] = JSON.parse(
-        JSON.stringify(useStore.getState().chats)
-      );
-      updatedChats[currentChatIndex].messages.splice(messageIndex, 1);
-      setChats(updatedChats);
+      aiService.currentAiBot?.currentChat?.deleteMessage(message)
     };
-
+    useBindObjectEvent(message)
+    
     const handleMove = (direction: 'up' | 'down') => {
-      const updatedChats: ChatInterface[] = JSON.parse(
-        JSON.stringify(useStore.getState().chats)
-      );
-      const updatedMessages = updatedChats[currentChatIndex].messages;
-      const temp = updatedMessages[messageIndex];
       if (direction === 'up') {
-        updatedMessages[messageIndex] = updatedMessages[messageIndex - 1];
-        updatedMessages[messageIndex - 1] = temp;
+        aiService.currentAiBot?.currentChat?.upIndex(message)
       } else {
-        updatedMessages[messageIndex] = updatedMessages[messageIndex + 1];
-        updatedMessages[messageIndex + 1] = temp;
+        aiService.currentAiBot?.currentChat?.downIndex(message)
       }
-      setChats(updatedChats);
     };
 
     const handleMoveUp = () => {
@@ -90,17 +67,12 @@ const ContentView = memo(
     };
 
     const handleRefresh = () => {
-      const updatedChats: ChatInterface[] = JSON.parse(
-        JSON.stringify(useStore.getState().chats)
-      );
-      const updatedMessages = updatedChats[currentChatIndex].messages;
-      updatedMessages.splice(updatedMessages.length - 1, 1);
-      setChats(updatedChats);
-      handleSubmit();
+      // 刷新index的回答
+      Locator.fetch(AIService).currentAiBot?.currentChat?.refresh(message)
     };
 
     const handleCopy = () => {
-      navigator.clipboard.writeText(content);
+      navigator.clipboard.writeText(message.content);
     };
 
     return (
@@ -129,25 +101,18 @@ const ContentView = memo(
                 p,
               }}
             >
-              {content}
+              {message.content}
             </ReactMarkdown>
           ) : (
-            <span className='whitespace-pre-wrap'>{content}</span>
+            <span className='whitespace-pre-wrap'>{message.content}</span>
           )}
         </div>
         <div className='flex justify-end gap-2 w-full mt-2'>
           {isDelete || (
             <>
-              {!useStore.getState().generating &&
-                role === 'assistant' &&
-                messageIndex === lastMessageIndex && (
-                  <RefreshButton onClick={handleRefresh} />
-                )}
-              {messageIndex !== 0 && <UpButton onClick={handleMoveUp} />}
-              {messageIndex !== lastMessageIndex && (
-                <DownButton onClick={handleMoveDown} />
-              )}
-
+              {!useStore.getState().generating && <RefreshButton onClick={handleRefresh} />}
+              <UpButton onClick={handleMoveUp} />
+              <DownButton onClick={handleMoveDown} />
               <MarkdownModeButton />
               <CopyButton onClick={handleCopy} />
               <EditButton setIsEdit={setIsEdit} />

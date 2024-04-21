@@ -5,7 +5,6 @@ import useHideOnOutsideClick from '@hooks/useHideOnOutsideClick';
 import PopupModal from '@components/PopupModal';
 import { availableEndpoints, defaultAPIEndpoint } from '@constants/auth';
 import DownChevronArrow from '@icon/DownChevronArrow';
-import { getSelfInfo, getToken, registerUser } from '@src/user/mgr/UserApi';
 import ReactDOM from 'react-dom';
 
 

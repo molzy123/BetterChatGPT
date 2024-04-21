@@ -6,21 +6,20 @@ import DownChevronArrow from '@icon/DownChevronArrow';
 import { ChatInterface, Role, roles } from '@type/chat';
 
 import useHideOnOutsideClick from '@hooks/useHideOnOutsideClick';
+import { IAiChatDef } from '@src/ai/data/AIDef';
+import { put } from '@src/common/utils/CommonRequest';
+import { AiChatMessage } from '@src/ai/data/AiChatMessage';
 
 const RoleSelector = React.memo(
   ({
-    role,
-    messageIndex,
+    message,
     sticky,
   }: {
-    role: Role;
-    messageIndex: number;
+    message: AiChatMessage
     sticky?: boolean;
   }) => {
     const { t } = useTranslation();
     const setInputRole = useStore((state) => state.setInputRole);
-    const setChats = useStore((state) => state.setChats);
-    const currentChatIndex = useStore((state) => state.currentChatIndex);
 
     const [dropDown, setDropDown, dropDownRef] = useHideOnOutsideClick();
 
@@ -28,11 +27,11 @@ const RoleSelector = React.memo(
       <div className='prose dark:prose-invert relative'>
         <button
           className='btn btn-neutral btn-small flex gap-1'
-          aria-label={t(role) as string}
+          aria-label={t(message.role) as string}
           type='button'
           onClick={() => setDropDown((prev) => !prev)}
         >
-          {t(role)}
+          {t(message.role)}
           <DownChevronArrow />
         </button>
         <div
@@ -51,12 +50,7 @@ const RoleSelector = React.memo(
                 className='px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white cursor-pointer'
                 onClick={() => {
                   if (!sticky) {
-                    const updatedChats: ChatInterface[] = JSON.parse(
-                      JSON.stringify(useStore.getState().chats)
-                    );
-                    updatedChats[currentChatIndex].messages[messageIndex].role =
-                      r;
-                    setChats(updatedChats);
+                    message.role = r
                   } else {
                     setInputRole(r);
                   }

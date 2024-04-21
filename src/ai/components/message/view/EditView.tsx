@@ -1,34 +1,29 @@
 import React, { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useStore from '@store/store';
-
 import useSubmit from '@hooks/useSubmit';
-
-import { ChatInterface } from '@type/chat';
-
 import PopupModal from '@components/PopupModal';
 import TokenCount from '@components/TokenCount';
-import CommandPrompt from '../CommandPrompt';
+import { AIService } from '@src/ai/mgr/AIService';
+import { Locator } from '@src/common/data/Locator';
+import { AiChatMessage } from '@src/ai/data/AiChatMessage';
+import CommandPrompt from '../commandprompt/CommandPrompt';
+import { AiApi } from '@src/ai/mgr/AiApi';
 
 const EditView = ({
-  content,
+  message,
   setIsEdit,
-  messageIndex,
   sticky,
 }: {
-  content: string;
+  message: AiChatMessage;
   setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
-  messageIndex: number;
   sticky?: boolean;
 }) => {
   const inputRole = useStore((state) => state.inputRole);
-  const setChats = useStore((state) => state.setChats);
-  const currentChatIndex = useStore((state) => state.currentChatIndex);
-
-  const [_content, _setContent] = useState<string>(content);
+  const [_content, _setContent] = useState<string>(message.content);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const textareaRef = React.createRef<HTMLTextAreaElement>();
-
+  const aiService = Locator.fetch(AIService)
   const { t } = useTranslation();
 
   const resetTextAreaHeight = () => {
@@ -65,44 +60,30 @@ const EditView = ({
 
   const handleSave = () => {
     if (sticky && (_content === '' || useStore.getState().generating)) return;
-    const updatedChats: ChatInterface[] = JSON.parse(
-      JSON.stringify(useStore.getState().chats)
-    );
-    const updatedMessages = updatedChats[currentChatIndex].messages;
     if (sticky) {
-      updatedMessages.push({ role: inputRole, content: _content });
+      aiService.currentAiBot?.currentChat?.addMessage(new AiChatMessage(inputRole, _content))
       _setContent('');
       resetTextAreaHeight();
     } else {
-      updatedMessages[messageIndex].content = _content;
+      message.content = _content
       setIsEdit(false);
     }
-    setChats(updatedChats);
   };
 
   const { handleSubmit } = useSubmit();
   const handleGenerate = () => {
     if (useStore.getState().generating) return;
-    const updatedChats: ChatInterface[] = JSON.parse(
-      JSON.stringify(useStore.getState().chats)
-    );
-    const updatedMessages = updatedChats[currentChatIndex].messages;
     if (sticky) {
       if (_content !== '') {
-        updatedMessages.push({ role: inputRole, content: _content });
+        aiService.currentAiBot?.currentChat?.addMessage(new AiChatMessage( inputRole, _content))
       }
       _setContent('');
       resetTextAreaHeight();
     } else {
-      updatedMessages[messageIndex].content = _content;
-      updatedChats[currentChatIndex].messages = updatedMessages.slice(
-        0,
-        messageIndex + 1
-      );
+      message.content = _content;
       setIsEdit(false);
     }
-    setChats(updatedChats);
-    handleSubmit();
+    aiService.currentAiBot?.currentChat?.generateChat()
   };
 
   useEffect(() => {
@@ -122,11 +103,10 @@ const EditView = ({
   return (
     <>
       <div
-        className={`w-full ${
-          sticky
-            ? 'py-2 md:py-3 px-2 md:px-4 border border-black/10 bg-white dark:border-gray-900/50 dark:text-white dark:bg-gray-700 rounded-md shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)]'
-            : ''
-        }`}
+        className={`w-full ${sticky
+          ? 'py-2 md:py-3 px-2 md:px-4 border border-black/10 bg-white dark:border-gray-900/50 dark:text-white dark:bg-gray-700 rounded-md shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)]'
+          : ''
+          }`}
       >
         <textarea
           ref={textareaRef}
@@ -185,9 +165,8 @@ const EditViewButtons = memo(
         <div className='flex-1 text-center mt-2 flex justify-center'>
           {sticky && (
             <button
-              className={`btn relative mr-2 btn-primary ${
-                generating ? 'cursor-not-allowed opacity-40' : ''
-              }`}
+              className={`btn relative mr-2 btn-primary ${generating ? 'cursor-not-allowed opacity-40' : ''
+                }`}
               onClick={handleGenerate}
               aria-label={t('generate') as string}
             >
@@ -211,13 +190,11 @@ const EditViewButtons = memo(
           )}
 
           <button
-            className={`btn relative mr-2 ${
-              sticky
-                ? `btn-neutral ${
-                    generating ? 'cursor-not-allowed opacity-40' : ''
-                  }`
-                : 'btn-neutral'
-            }`}
+            className={`btn relative mr-2 ${sticky
+              ? `btn-neutral ${generating ? 'cursor-not-allowed opacity-40' : ''
+              }`
+              : 'btn-neutral'
+              }`}
             onClick={handleSave}
             aria-label={t('save') as string}
           >

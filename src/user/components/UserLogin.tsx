@@ -2,37 +2,33 @@ import React, { useEffect, useState } from 'react';
 import useStore from '@store/store';
 import ReactDOM from 'react-dom';
 import { Locator } from '@src/common/data/Locator';
-import { UserService } from '@src/user/mgr/UserService';
+import { UserService, UserStateEnum } from '@src/user/mgr/UserService';
+import { PopupService } from '@src/common/Popup/PopupService';
 
-const UserLogin = ({ setIsModalOpen, }: { setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>; }) => {
+const UserLogin = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const setUserToken = useStore((state) => state.setUserToken);
   const userToken = useStore((state) => state.userToken);
   const [isLogin, setIsLogin] = useState(true);
-
+  const userService = Locator.fetch(UserService)
   const handleLogin = async () => {
-    const userService = Locator.fetch(UserService)
     userService.login(username, password,function(){
       // 关闭模态框
-      setIsModalOpen(false);
+      Locator.fetch(PopupService).hidePopup()
     })
   };
 
   const handleRegister = async () => {
-    // 处理注册逻辑，例如 API 调用等
-    console.log('注册:', username, password);
 
-    const user = await registerUser(username, password,email);
-    if(user != undefined){
-      console.log('注册成功:' + user.name);
+    userService.register(username, password,email, function(){
       setIsLogin(true);
-    }
+    })
   }
 
   const handleClose = function(){
-    setIsModalOpen(false);
+    Locator.fetch(PopupService).hidePopup()
   }
 
   const register = function(){
@@ -46,7 +42,7 @@ const UserLogin = ({ setIsModalOpen, }: { setIsModalOpen: React.Dispatch<React.S
         <div className="h-10 text-center">
           <h2 className=" text-2xl text-gray-300 font-bold mb-4">{isLogin?"login":"register"}</h2>
         </div>
-        <form>
+        <div>
           <div className="mb-4">
             <label htmlFor="username" className="text-gray-300">
               用户名：
@@ -106,7 +102,7 @@ const UserLogin = ({ setIsModalOpen, }: { setIsModalOpen: React.Dispatch<React.S
               </button>
             </div>
           </div>
-        </form>
+        </div>
       </div>
       <div className='bg-gray-800/90 absolute top-0 left-0 h-full w-full z-[-1]'
            onClick={handleClose}

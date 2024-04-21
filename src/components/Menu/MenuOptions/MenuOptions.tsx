@@ -9,7 +9,6 @@ import SettingsMenu from '@components/SettingsMenu';
 import CollapseOptions from './CollapseOptions';
 import GoogleSync from '@components/GoogleSync';
 import { TotalTokenCostDisplay } from '@components/SettingsMenu/TotalTokenCost';
-import User from '@components/Menu/MenuOptions/User';
 
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || undefined;
 
@@ -30,8 +29,6 @@ const MenuOptions = () => {
         <ImportExportChat />
         {/*<Api />*/}
         <SettingsMenu />
-        {/*<Me />*/}
-        <User/>
       </div>
     </>
   );

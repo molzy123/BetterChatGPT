@@ -1,39 +1,36 @@
 import React, { useState } from 'react';
 import useStore from '@store/store';
 
-import ContentView from './View/ContentView';
-import EditView from './View/EditView';
+import ContentView from './view/ContentView';
+import EditView from './view/EditView';
+import { AiChatMessage } from '@src/ai/data/AiChatMessage';
 
 const MessageContent = ({
-  role,
-  content,
-  messageIndex,
+  message,
+  index,
   sticky = false,
 }: {
-  role: string;
-  content: string;
-  messageIndex: number;
+  index:number;
+  message:AiChatMessage;
   sticky?: boolean;
 }) => {
   const [isEdit, setIsEdit] = useState<boolean>(sticky);
   const advancedMode = useStore((state) => state.advancedMode);
-
+  
   return (
     <div className='relative flex flex-col gap-2 md:gap-3 lg:w-[calc(100%-115px)]'>
       {advancedMode && <div className='flex flex-grow flex-col gap-3'></div>}
       {isEdit ? (
         <EditView
-          content={content}
+          message={message}
           setIsEdit={setIsEdit}
-          messageIndex={messageIndex}
           sticky={sticky}
         />
       ) : (
         <ContentView
-          role={role}
-          content={content}
+          message={message}
+          index = {index}
           setIsEdit={setIsEdit}
-          messageIndex={messageIndex}
         />
       )}
     </div>

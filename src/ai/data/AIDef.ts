@@ -1,14 +1,15 @@
-import { ModelOptions, Role } from '@type/chat';
+import { message } from '@components/Chat/ChatContent/Message';
+import { ModelOptions, Role } from '../../../../BetterChatGPT/src/types/chat';
 
 
-export interface IAiBotCreateBean {
+export interface IAiBotCreateDef {
   user_id: string;
   name: string;
   summary: string;
-  config: IAiConfigBean;
+  config: IAiConfigDef;
 }
 
-export interface IAiConfigBean {
+export interface IAiConfigDef {
   model: ModelOptions;
   max_tokens: number;
   temperature: number;
@@ -21,66 +22,113 @@ export interface IAiConfigBean {
 }
 
 
-export interface IAiBotDataBean {
+export interface IAiBotDef {
   id: string;
   user_id: string;
   name: string;
   summary: string;
-  config: IAiConfigBean;
+  config: IAiConfigDef;
 }
 
-export interface IAiChatMessage {
-  index?: number;
+export interface IAiChatMessageDef {
   name?: string;
   role: Role;
   content: string;
 }
 
-export interface IAiChat {
+export interface IAiChatDef {
   id:string
   ai_bot_id: string;
   chat_title: string;
-  messages: IAiChatMessage[];
+  messages: IAiChatMessageDef[];
   start_time: string;
   end_time: string;
 }
 
-export class AiConfig implements IAiConfigBean {
-  model: ModelOptions;
-  max_tokens: number;
-  temperature: number;
-  top_p: number;
-  presence_penalty: number;
-  frequency_penalty: number;
-  n: number;
-  seed?: number;
-  stream?: boolean;
+export interface IAiChatGenerateDef extends IAiConfigDef {
+  messages: IAiChatMessageDef[];
+}
 
-  constructor(model: ModelOptions = 'gpt-3.5-turbo', max_tokens: number = 4096, temperature: number = 0.5, top_p: number = 1, presence_penalty: number = 0, frequency_penalty: number = 0, n: number = 16, seed?: number, stream?: boolean) {
-    this.model = model;
-    this.max_tokens = max_tokens;
-    this.temperature = temperature;
-    this.top_p = top_p;
-    this.presence_penalty = presence_penalty;
-    this.frequency_penalty = frequency_penalty;
-    this.n = n;
-    this.seed = seed;
-    this.stream = stream;
+export interface IAiChatGenerateResponseDef {
+  id:string
+  choices:[{
+    finish_reason: string
+    index: number
+    message:{
+      content?:string
+      tools_calls?:[
+        {
+          id:string
+          type:string
+          function:{
+            name:string
+            arguments:string
+          }
+        }
+      ]
+      role:string
+
+    }
+    logprobs?:{
+      content?:[{
+        token: string
+        logprob: number
+        bytes?:[]
+        top_logprobs?:[{
+          token: string
+          logprob: number
+          bytes?:[]
+        }]
+      }]
+    }
+  }]
+  created: number
+  model: string
+  system_fingerprint?: string
+  object:string
+  usage?: {
+    completion_tokens: number
+    prompt_tokens: number
+    total_tokens: number
   }
 }
 
-
-export class AiBotCreate implements IAiBotCreateBean {
-  user_id: string = "";
-  name: string;
-  summary: string;
-  config: IAiConfigBean;
-
-  constructor(name: string = "机器人", summary: string = "", config: IAiConfigBean = new AiConfig()) {
-    this.name = name;
-    this.summary = summary;
-    this.config = config;
-  }
+export interface IAiChatGenerateChunkDef{
+  id:string
+  choices:[{
+    finish_reason: string
+    index: number
+    delta:{
+      content?:string
+      tools_calls?:[
+        {
+          id:string
+          type:string
+          function:{
+            name:string
+            arguments:string
+          }
+        }
+      ]
+      role:string
+    }
+    logprobs?:{
+      content?:[{
+        token: string
+        logprob: number
+        bytes?:[]
+        top_logprobs?:[{
+          token: string
+          logprob: number
+          bytes?:[]
+        }]
+      }]
+    }
+  }]
+  created: number
+  model: string
+  system_fingerprint?: string
+  object:string
 }
 
-export default IAiBotCreateBean;
+export default IAiBotCreateDef;

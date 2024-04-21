@@ -3,6 +3,7 @@ import { MessageInterface, ModelOptions, TotalTokenUsed } from '@type/chat';
 import useStore from '@store/store';
 
 import { Tiktoken } from '@dqbd/tiktoken/lite';
+import { IAiChatMessageDef } from '@src/ai/data/AIDef';
 const cl100k_base = await import('@dqbd/tiktoken/encoders/cl100k_base.json');
 
 const encoder = new Tiktoken(
@@ -44,11 +45,11 @@ const countTokens = (messages: MessageInterface[], model: ModelOptions) => {
 };
 
 export const limitMessageTokens = (
-  messages: MessageInterface[],
+  messages: IAiChatMessageDef[],
   limit: number = 4096,
   model: ModelOptions
-): MessageInterface[] => {
-  const limitedMessages: MessageInterface[] = [];
+): IAiChatMessageDef[] => {
+  const limitedMessages: IAiChatMessageDef[] = [];
   let tokenCount = 0;
 
   const isSystemFirstMessage = messages[0]?.role === 'system';

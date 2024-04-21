@@ -8,6 +8,13 @@ import DeleteIcon from '@icon/DeleteIcon';
 import EditIcon from '@icon/EditIcon';
 import TickIcon from '@icon/TickIcon';
 import useStore from '@store/store';
+import { AiChat } from '@src/ai/data/AIChat';
+import { Locator } from '@src/common/data/Locator';
+import { AIService } from '@src/ai/mgr/AIService';
+import { useBindEventRefresh } from '@src/common/Event/EventService';
+import { EventEnum } from '@src/common/Event/EventEnum';
+import { useBindObjectEvent } from '@src/common/Event/WeakObjectEventService';
+import { AiBot } from '@src/ai/data/AiBot';
 
 const ChatHistoryClass = {
   normal:
@@ -21,38 +28,22 @@ const ChatHistoryClass = {
 };
 
 const ChatHistory = React.memo(
-  ({ title, chatIndex }: { title: string; chatIndex: number }) => {
-    const initialiseNewChat = useInitialiseNewChat();
-    const setCurrentChatIndex = useStore((state) => state.setCurrentChatIndex);
-    const setChats = useStore((state) => state.setChats);
-    const active = useStore((state) => state.currentChatIndex === chatIndex);
+  ({ currentAiBot, chat, chatIndex, active }: { currentAiBot:AiBot ;chat: AiChat; chatIndex: number; active:boolean }) => {
     const generating = useStore((state) => state.generating);
 
     const [isDelete, setIsDelete] = useState<boolean>(false);
     const [isEdit, setIsEdit] = useState<boolean>(false);
-    const [_title, _setTitle] = useState<string>(title);
+    const [_title, _setTitle] = useState<string>(chat.title);
+    useBindObjectEvent(chat)
     const inputRef = useRef<HTMLInputElement>(null);
 
     const editTitle = () => {
-      const updatedChats = JSON.parse(
-        JSON.stringify(useStore.getState().chats)
-      );
-      updatedChats[chatIndex].title = _title;
-      setChats(updatedChats);
+      chat.title = _title;
       setIsEdit(false);
     };
 
     const deleteChat = () => {
-      const updatedChats = JSON.parse(
-        JSON.stringify(useStore.getState().chats)
-      );
-      updatedChats.splice(chatIndex, 1);
-      if (updatedChats.length > 0) {
-        setCurrentChatIndex(0);
-        setChats(updatedChats);
-      } else {
-        initialiseNewChat();
-      }
+      currentAiBot.deleteChat(chat);
       setIsDelete(false);
     };
 
@@ -75,11 +66,6 @@ const ChatHistory = React.memo(
       setIsEdit(false);
     };
 
-    const handleDragStart = (e: React.DragEvent<HTMLAnchorElement>) => {
-      if (e.dataTransfer) {
-        e.dataTransfer.setData('chatIndex', String(chatIndex));
-      }
-    };
 
     useEffect(() => {
       if (inputRef && inputRef.current) inputRef.current.focus();
@@ -95,13 +81,14 @@ const ChatHistory = React.memo(
             : 'cursor-pointer opacity-100'
         }`}
         onClick={() => {
-          if (!generating) setCurrentChatIndex(chatIndex);
+          if (!generating)
+          {
+            currentAiBot.currentChat = chat;
+          } 
         }}
-        draggable
-        onDragStart={handleDragStart}
       >
         <ChatIcon />
-        <div className='flex-1 text-ellipsis max-h-5 overflow-hidden break-all relative' title={title}>
+        <div className='flex-1 text-ellipsis max-h-5 overflow-hidden break-all relative' title={chat.title}>
           {isEdit ? (
             <input
               type='text'

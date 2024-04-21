@@ -1,73 +1,31 @@
-import { ShareGPTSubmitBodyInterface } from '@type/api';
-import { ConfigInterface, MessageInterface, ModelOptions } from '@type/chat';
-import { handleErrorStatus, isAzureEndpoint } from '@utils/api';
+import { BaseRpcRequest } from '@src/common/Net/RpcRequest';
 
-export const getToken = async (username:string,password:string ) => {
-  try {
+export const UserApi = {
+  getToken : async (username:string,password:string,success:(response:any)=>void) => {
     // 创建一个 FormData 实例
-    const formData = new FormData();
-    formData.append('username', username);
-    formData.append('password', password);
-    const response = await fetch('http://127.0.0.1:8000/token', {
-      method: 'POST',
-      body: formData,
-    });
+    let formData = new FormData();
+    formData.set('username', username)
+    formData.set('password', password)
+    const rpc = new BaseRpcRequest("http://127.0.0.1:8000/token",success,"POST",formData)
+    rpc.headers = {};
+    await rpc.send()
+  },
 
-    if (!response.ok) {
-      const error = await  response.json()
-      error.status = response.status
-      throw new Error(JSON.stringify(error));
-    }else{
-      const result = await response.json();
-      return result.access_token;
+  registerUser : async (username:string,password:string,email:string,success:(response:any)=>void) => {
+    const body = {
+      "username":username,
+      "password":password,
+      "email":email
     }
-  } catch (error) {
-    handleErrorStatus(error)
-    return "";
-  }
-};
+    // 使用BaseRpcRequest发送请求
+    const rpc = new BaseRpcRequest("http://127.0.0.1:8000/user/",success,"POST",body)
+    await rpc.send()
+  },
 
-export const registerUser = async (username:string,password:string,email:string) => {
-    try {
-      console.log(username,password,email)
-      const response = await fetch('http://127.0.0.1:8000/user/', {
-        method: 'POST',
-        headers:{
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          "username":username,
-          "password":password,
-          "email":email
-        }),
-      });
-      if(!response.ok){
-        const error = await  response.json()
-        error.status = response.status
-        throw new Error(JSON.stringify(error));
-      }
-      return response.json();
-    } catch (error) {
-        handleErrorStatus(error)
-    }
-}
-
-
-export const getSelfInfo = async (token: string) => {
-  try {
-    const response = await fetch('http://127.0.0.1:8000/users/me/', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    if (!response.ok) {
-      const error = await  response.json()
-      error.status = response.status
-      throw new Error(JSON.stringify(error));
-    }
-    const result = await response.json();
-    return result;
-  } catch (error) {
-    handleErrorStatus(error)
+  getUser : async (success:(response:any)=>void) => {
+    const rpc = new BaseRpcRequest("http://127.0.0.1:8000/user/",success)
+    await rpc.send()
   }
 }
+
+

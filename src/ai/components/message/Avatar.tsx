@@ -2,6 +2,7 @@ import React from 'react';
 import { Role } from '@type/chat';
 import SettingIcon from '@icon/SettingIcon';
 import PersonIcon from '@icon/PersonIcon';
+import { useBindEvent } from '@src/common/Event/EventService';
 
 const Avatar = React.memo(({ role }: { role: Role }) => {
   return (

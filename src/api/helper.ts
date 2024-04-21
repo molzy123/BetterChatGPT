@@ -1,8 +1,9 @@
+import { IAiChatGenerateResponseDef } from '@src/ai/data/AIDef';
 import { EventSourceData } from '@type/api';
 
-export const parseEventSource = (
+export const parseChunk = (
   data: string
-): '[DONE]' | EventSourceData[] => {
+): '[DONE]' | any[] => {
   const result = data
     .split('\n\n')
     .filter(Boolean)

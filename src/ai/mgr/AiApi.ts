@@ -1,81 +1,53 @@
 import { handleErrorStatus } from '@utils/api';
-import IAiBotCreateDef, { IAiBotDef, IAiChatDef } from '@src/ai/data/AIDef';
-import { get, post } from '@src/common/utils/CommonRequest';
+import IAiBotCreateDef, { IAiBotDef, IAiChatDef, IAiChatGenerateDef, IAiChatMessageDef, IAiConfigDef } from '@src/ai/data/AIDef';
 import { getChatCompletion } from '@api/api';
-import { AiBot } from '@src/ai/data/AiBot';
-import { BeanFactory } from '@src/ai/mgr/BeanFactory';
-import { AiChat } from '@src/ai/data/AIChat';
+import { BaseRpcRequest, StreamRpcRequest } from '@src/common/Net/RpcRequest';
 import { Locator } from '@src/common/data/Locator';
-import { UserService } from '@src/user/UserService';
-import { BaseRpcRequest } from '@src/common/data/RPCService';
-import { success } from 'concurrently/dist/src/defaults';
-
-export const createAiBot = function(data:IAiBotCreateDef, success:(response:any)=>void)
-{
-  const rpc = new BaseRpcRequest("http://127.0.0.1:8000/AIChat/bot/",success,"POST",data)
-  return rpc.sendRequest()
-};
+import { UserService } from '@src/user/mgr/UserService';
 
 
-export const getAiBotList = async function(success:(response:any)=>void)
-{
-
-  const rpc = new BaseRpcRequest("http://127.0.0.1:8000/AIChat/bot/",success);
-  return rpc.sendRequestAsync()
-  // const accessToken =  Locator.fetch(UserService).accessToken;
-  // const response = await get("http://127.0.0.1:8000/AIChat/bot/",accessToken);
-  // if (response !== undefined) {
-  //   const aiBotList:IAiBotDataBean[] = await response.json();
-  //   let result:AiBot[] = []
-  //   for (let iAiBotDataBean of aiBotList) {
-  //     result.push(BeanFactory.createAiBot(iAiBotDataBean));
-  //   }
-  //   return result
-  // }
-}
-
-export const getAiChatListByBotId = async function(botId:string,success:(response:any)=>void) {
-
-  const rpc = new BaseRpcRequest(`http://127.0.0.1:8000/AIChat/Chat/${botId}`,success)
-  return rpc.sendRequestAsync()
-
-  // const response = await get(`http://127.0.0.1:8000/AIChat/Chat/${botId}`,accessToken);
-  // if (response !== undefined) {
-  //   const aiChatList:IAiChat[] = await response.json();
-  //   let result:AiChat[] = []
-  //   for (let iAiChat of aiChatList) {
-  //     result.push(BeanFactory.createAiChat(iAiChat));
-  //   }
-  //   return result
-  // }
-}
-
-export const getFirstAiChatByBotId = async function(botId:string,success:(response:any)=>void)
-{
-
-  const rpc = new BaseRpcRequest(`http://127.0.0.1:8000/AIChat/Chat/${botId}/first`,success)
-  return rpc.sendRequestAsync()
-
-  // const response = await get(`http://127.0.0.1:8000/AIChat/Chat/${botId}/first`,accessToken);
-  // if (response !== undefined) {
-  //   const aiChat: IAiChat = await response.json();
-  //   return BeanFactory.createAiChat(aiChat);
-  // }
-}
-
-
-export const generateTitle = async (currentChat: IAiChatDef , currentAiBot:IAiBotDef, accessToken:string): Promise<string> => {
-  let data;
-  try {
-    // 使用自定义ApiKey
-    data = await getChatCompletion(
-      "http://127.0.0.1:8000/AIChat/",
-      currentChat.messages,
-      currentAiBot.config,
-      accessToken,
-    );
-  } catch (error) {
-    handleErrorStatus(error);
+export const AiApi = {
+  createAiBot : function(data:IAiBotCreateDef, success:(response:IAiBotDef)=>void)
+  {
+    const rpc = new BaseRpcRequest("http://127.0.0.1:8000/ai/bot/",success,"POST",data)
+    return rpc.send()
+  },
+  getAiBotList : async function(success:(response:any)=>void)
+  {
+    const rpc = new BaseRpcRequest("http://127.0.0.1:8000/ai/bot/",success);
+    return rpc.send()
+  },
+  getAiChatListByBotId : async function(botId:string,success:(response:any)=>void) {
+    const rpc = new BaseRpcRequest(`http://127.0.0.1:8000/ai/chat/${botId}`,success)
+    return rpc.send()
+  },
+  getFirstAiChatByBotId : async function(botId:string,success:(response:any)=>void)
+  {
+    const rpc = new BaseRpcRequest(`http://127.0.0.1:8000/ai/chat/${botId}/first`,success)
+    return rpc.send()
+  },
+  generateTitle : async (data:IAiChatGenerateDef, success:(response:any)=>void)=> {
+    const rpc = new BaseRpcRequest("http://127.0.0.1:8000/ai/",success,"POST",data)
+    return rpc.send()
+  },
+  createAiChat : async function(data:IAiChatDef, success:(response:any)=>void)
+  {
+    const rpc = new BaseRpcRequest("http://127.0.0.1:8000/ai/chat/",success,"POST",data)
+    return rpc.send()
+  },
+  updateAiChat : async function(data:IAiChatDef, success:(response:any)=>void)
+  {
+    const rpc = new BaseRpcRequest("http://127.0.0.1:8000/ai/chat/",success,"PUT",data)
+    return rpc.send()
+  },
+  deleteAiChat : async function(id:string, success:(response:any)=>void)
+  {
+    const rpc = new BaseRpcRequest(`http://127.0.0.1:8000/ai/chat/${id}`,success,"DELETE")
+    return rpc.send();
+  },
+  generateChat : async function(data:IAiChatGenerateDef, success:(response:any)=>void,onEnd:()=>void)
+  {
+    const streamRpc = new StreamRpcRequest(`http://127.0.0.1:8000/ai/`,success,"POST",data,undefined,onEnd)
+    streamRpc.send()
   }
-  return data.choices[0].message.content; // 返回生成的标题内容
-};
+}
