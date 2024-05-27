@@ -22,7 +22,7 @@ const NewChat = ({ folder }: { folder?: string }) =>
   const generating = useStore((state) => state.generating);
   const [newBot, setNewBot] = React.useState(false);
   return (
-    <div className={'flex flex-1'}>
+    <div className={'flex flex-1 flex-col'}>
       <a
         className={`flex flex-1 items-center rounded-md hover:bg-gray-500/10 transition-all duration-200 text-white text-sm flex-shrink-0 ${
           generating
@@ -52,14 +52,12 @@ const NewChat = ({ folder }: { folder?: string }) =>
       <a onClick={() =>
       {
         Locator.fetch(PopupService).showPopup(MyBotUI)
-      }} className={'cursor-pointer opacity-100 border border-white/20 rounded-md mx-1 items-center text-gray-100'}>
+      }} className={'p-2 mb-2 cursor-pointer opacity-100 border hover:bg-gray-500/10 border-white/20 rounded-md items-center text-gray-100'}>
         Bot List
       </a>
 
-      <a onClick={() =>
-      {
-        Locator.fetch(PopupService).showPopupOnce(CreateAiBotUI,{ aiBot:new AiBot()});
-      }} className={'cursor-pointer opacity-100 border border-white/20 rounded-md mx-1 items-center text-gray-100'}>
+      <a onClick={() =>{Locator.fetch(PopupService).showPopupOnce(CreateAiBotUI,{ aiBot:new AiBot()});}} 
+      className={'p-2 mb-2 cursor-pointer opacity-100 border hover:bg-gray-500/10 border-white/20 rounded-md items-center text-gray-100'}>
         New Bot
       </a>
     </div>

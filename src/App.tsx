@@ -56,14 +56,12 @@ function App() {
   }, []);
   return (
     <div className='flex flex-col h-screen'>
-      <header className='flex items-center justify-between w-full p-4 bg-blue-500 text-white'>
+      <header className='flex items-center justify-between w-full p-2 bg-gray-850 text-white'>
         <nav className='flex space-x-4'>
           {tabs.map((tab) => (
             <button
               key={tab}
-              className={`px-3 py-2 font-semibold rounded-md ${
-                activeTab === tab ? 'bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'
-              }`}
+              className={` p-1 text-md ${ activeTab === tab ? 'text-gray-300' : 'text-gray-500 hover:text-gray-300'}`}
               onClick={() => handleTabClick({ tab: tab })}
             >
               {tab}

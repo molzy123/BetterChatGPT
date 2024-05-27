@@ -5,9 +5,10 @@ import { code, p } from '@src/ai/components/message/view/ContentView';
 import { AiChatMessage } from '@src/ai/data/AiChatMessage';
 import { ContextMenuService } from '@src/common/ContextMenu/ContextMenuService';
 import { useBindObjectEvent } from '@src/common/Event/WeakObjectEventService';
+import { CommonTextInput } from '@src/common/components/CommonTextInput';
 import { Locator } from '@src/common/data/Locator';
 import useStore from '@store/store';
-import React, { MouseEventHandler, useCallback, useEffect } from 'react';
+import React, { MouseEventHandler, useCallback, useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeHighlight from 'rehype-highlight';
 import rehypeKatex from 'rehype-katex';
@@ -20,6 +21,7 @@ interface ArticleProps {
 
 const Article: React.FC<ArticleProps> = ({ message }) => {
   useBindObjectEvent(message);
+  const [prompt, setPrompt] = useState<string>('');
   const inlineLatex = useStore((state) => state.inlineLatex);
   const handleRightClick = useCallback((event: React.MouseEvent<HTMLElement>) => {
     // 阻止默认的上下文菜单显示
@@ -42,11 +44,16 @@ const Article: React.FC<ArticleProps> = ({ message }) => {
     }
   }, []);
   return (
-    <div className="flex flex-col items-center w-full">
-      <div className=" bg-gray-700 w-[50%] pt-5 text-gray-100 text-lg flex-grow overflow-auto overflow-x-hidden"
+    <div className="flex flex-col items-center w-full  ">
+      <div className=" bg-gray-700 flex w-full justify-between text-gray-100  flex-1 overflow-auto overflow-x-hidden"
         // onContextMenu={handleRightClick}
         onMouseUp={handleRightClick}>
-        <ReactMarkdown
+          <div className="w-20 bg-gray-700">
+
+          </div>
+
+        <div className=" w-[500px] pt-5 text-lg">
+          <ReactMarkdown
           remarkPlugins={[
             remarkGfm,
             [remarkMath, { singleDollarTextMath: inlineLatex }],
@@ -70,9 +77,16 @@ const Article: React.FC<ArticleProps> = ({ message }) => {
         >
           {message.content}
         </ReactMarkdown>
-      </div>
-      <div className="bg-gray-400 h-[50px] w-full">
+        </div>
+        <div className="w-20 bg-gray-700">
 
+          </div>
+      </div>
+      <div className="bg-gray-700 h-[70px] flex-grow-0 w-full flex-shrink-0 flex items-center  overflow-hidden">
+        <div className="w-full p-4">
+          <CommonTextInput hintText="prompt" value={prompt} onChange={setPrompt} maxHeight={50} />
+        </div>
+        
       </div>
     </div>
 

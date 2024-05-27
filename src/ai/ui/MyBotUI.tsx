@@ -29,11 +29,11 @@ const MyBotUI = () => {
 
   return (<div
     className='fixed top-0 left-0 z-[999] w-full overflow-x-hidden overflow-y-auto h-full flex justify-center items-center'>
-    <div className='max-auto flex flex-col  bg-gray-600 border-2 border-gray-400 rounded-xl p-8'>
+    <div className='max-auto flex flex-col w-[700px] h-[70%] overflow-y-auto  bg-gray-800 border-2 border-gray-700 rounded-xl p-8'>
       <div className='h-10 flex justify-center items-center text-center'>
         <h2 className=' text-2xl text-gray-300 font-bold mb-4'>{isLogin ? 'login' : 'register'}</h2>
       </div>
-      <div className='flex basis-auto min-w-[450px] gap-10 flex-wrap'>
+      <div className='flex basis-auto gap-3 flex-wrap'>
         {bots.map((item, index) => (
           <AiBotItemUI key={index} aiBot={item}/>
         ))}

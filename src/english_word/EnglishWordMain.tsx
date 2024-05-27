@@ -105,11 +105,10 @@ const EnglishWordMain = () => {
     });
 
   return (
-    <div className="bg-gray-700 flex h-full">
-      <div className=" w-[500px] h-full px-1">
+    <div className="bg-gray-800 flex h-full">
+      <div className=" w-[300px] h-full">
         {wordList && <WordList words={wordList}/>}
       </div>
-      <div className='w-[1px] bg-slate-200'></div>
       <div className="flex-grow flex h-ful justify-center" >
         {message && <Article message={message}/>  }
       </div>
