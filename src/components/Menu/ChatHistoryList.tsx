@@ -24,9 +24,9 @@ const ChatHistoryList = ({currentAiBot}:{currentAiBot:AiBot}) => {
       className={`flex-col flex-1 overflow-y-auto hide-scroll-bar border-b border-white/20 `}>
       <ChatSearch filter={filter} setFilter={setFilter} />
       {currentAiBot && 
-        <div className='flex flex-col gap-2 text-gray-100 text-sm'>
+        <div className={`flex flex-col gap-2 text-gray-100 text-sm`}>
           {currentBotChatList.map((chat, index) => (
-            <ChatHistory currentAiBot={currentAiBot} chat={chat} active={chat == currentAiBot.currentChat} key={index} chatIndex={index} />
+            <ChatHistory currentAiBot={currentAiBot} chat={chat} active={chat == currentAiBot.currentChat} key={index} />
           ))}
         </div>
       }

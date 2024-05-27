@@ -17,6 +17,7 @@ export type errorType = {
 export const handleErrorStatus = (errorArg:any) => {
   console.log(errorArg);
   const errorStr = errorArg
+  console.log(errorStr);
   if(typeof errorStr === 'string') {
     let error:errorType = JSON.parse(errorStr)
     const status = error.status

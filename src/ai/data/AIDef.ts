@@ -1,16 +1,22 @@
-import { message } from '@components/Chat/ChatContent/Message';
 import { ModelOptions, Role } from '../../../../BetterChatGPT/src/types/chat';
 
 
 export interface IAiBotCreateDef {
-  user_id: string;
+  userId: string;
   name: string;
-  summary: string;
+  description: string;
   config: IAiConfigDef;
 }
 
+export interface IAiBotUpdateDef {
+    id:number;
+    name?:string;
+    description?:string;
+    templateId?:string;
+}
+
 export interface IAiConfigDef {
-  model: ModelOptions;
+  model: string;
   max_tokens: number;
   temperature: number;
   top_p: number;
@@ -23,14 +29,18 @@ export interface IAiConfigDef {
 
 
 export interface IAiBotDef {
-  id: string;
-  user_id: string;
+  id: number;
+  userId: string;
   name: string;
-  summary: string;
+  description: string;
   config: IAiConfigDef;
+  templateId?: string;
 }
 
 export interface IAiChatMessageDef {
+  id?:string;
+  index?:number;
+  chatId?: string;
   name?: string;
   role: Role;
   content: string;
@@ -38,11 +48,11 @@ export interface IAiChatMessageDef {
 
 export interface IAiChatDef {
   id:string
-  ai_bot_id: string;
-  chat_title: string;
+  botId: string;
+  name: string;
   messages: IAiChatMessageDef[];
-  start_time: string;
-  end_time: string;
+  createTime: string;
+  lastEditTime: string;
 }
 
 export interface IAiChatGenerateDef extends IAiConfigDef {

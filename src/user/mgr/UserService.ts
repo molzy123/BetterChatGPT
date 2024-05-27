@@ -3,10 +3,12 @@ import { UserApi } from '@src/user/mgr/UserApi';
 import { Locator } from '@src/common/data/Locator';
 import { StorageService } from '@src/common/data/StorageService';
 import { User } from '@src/user/data/User';
-import { UserDef } from '@src/user/data/UserDef';
+import { UserAllDef, UserDef } from '@src/user/data/UserDef';
 import { EventService } from '@src/common/Event/EventService';
 import { EventEnum } from '@src/common/Event/EventEnum';
 import { AbstractModule } from '@src/common/data/AbstractModule';
+import { ApiResponse } from '@src/ai/mgr/AiApi';
+import { AIService } from '@src/ai/mgr/AIService';
 
 
 export enum UserStateEnum {
@@ -41,11 +43,11 @@ export class UserService extends AbstractModule {
   public user?:User;
 
   public login(username: string, password: string, cb?: Function): void {
-    const success = (data:any) => {
+    const success = (response:any) => {
       if (cb !== undefined) {
-        cb(data);
+        cb(response);
       }
-      this.accessToken = data.access_token;
+      this.accessToken = response.token;
     };
     UserApi.getToken(username, password, success);
   }
@@ -72,8 +74,9 @@ export class UserService extends AbstractModule {
   public updateUser():void
   {
     if(this.accessToken != ''){
-      const success = async (data: UserDef) => {
+      const success = async (data: UserAllDef) => {
         this.user = User.fromJson(data)
+        Locator.fetch(AIService).onGetAiBotListComplete(this.user.bots)
       };
       UserApi.getUser(success)
     }

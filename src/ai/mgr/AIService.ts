@@ -35,6 +35,7 @@ export function useEventValue<T>(value: T):T {
 
 
 export class AIService extends AbstractModule {
+  
   private _currentAiBot: AiBot | undefined = undefined;
   set currentAiBot(value: AiBot | undefined) {
     if (value == undefined || value == this._currentAiBot) {
@@ -55,25 +56,14 @@ export class AIService extends AbstractModule {
 
   public _aiBotList: AiBot[] = [];
   set aiBotList(value: AiBot[]) {
+    console.trace(">>>")
     this._aiBotList = value;
   }
   get aiBotList() {
     return this._aiBotList;
   }
 
-  private aiBotMap: Map<string, AiBot> = new Map<string, AiBot>();
-
-  initialize(): void {
-    this.onEvent(EventEnum.LOGIN, () => {
-      AiApi.getAiBotList(this.onGetAiBotListComplete);
-    });
-  }
-
-  start(): void {}
-
-  afterStart(): void {}
-
-  destroy(): void {}
+  private aiBotMap: Map<number, AiBot> = new Map<number, AiBot>();
 
   public createAiBot(data: IAiBotCreateDef, cb?: Function) {
     AiApi.createAiBot(data, (data: IAiBotDef) => {
@@ -86,17 +76,23 @@ export class AIService extends AbstractModule {
     });
   }
 
-  private onGetAiBotListComplete = (data: IAiBotDef[]) => {
+  public onGetAiBotListComplete = (data: IAiBotDef[]) => {
     this.aiBotList = data.map((item) => {
       const aiBot = AiBot.fromJson(item);
       this.aiBotMap.set(aiBot.id, aiBot);
       return aiBot;
     });
     this.currentAiBot = this.aiBotList[this.aiBotList.length - 1];
+    EventService.dispatchEvent(EventEnum.BOT_INIT_COMPLETE, this.aiBotList);
   };
 
-  public getBotById(id:string)
+  public getBotById(id:number)
   {
     return this.aiBotMap.get(id);
+  }
+
+  getArticleBot(): AiBot | undefined {
+    console.log(">>>>>>>>>>>>>>>>初始化", this.aiBotMap.get(13));
+    return this.getBotById(13);
   }
 }

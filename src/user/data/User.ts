@@ -1,21 +1,19 @@
-import { UserDef } from '@src/user/data/UserDef';
+import { UserAllDef, UserDef } from '@src/user/data/UserDef';
+import { IAiBotDef } from '@src/ai/data/AIDef';
 
 
 export class User{
   id:string = ""
   username: string = ""
   email: string = ""
-  disabled:  boolean = false
   password: string = ""
-  ai_point: number = 0
+  bots: IAiBotDef[] = []
 
-  static fromJson(json: UserDef): User {
+  static fromJson(json: UserAllDef): User {
     const user = new User();
     user.username = json.username;
     user.email = json.email;
-    user.disabled = json.disabled;
-    user.password = json.password;
-    user.ai_point = json.ai_point;
+    user.bots = json.bots;
     return user;
   }
 
@@ -24,9 +22,7 @@ export class User{
       id:this.id,
       username: this.username,
       email: this.email,
-      disabled: this.disabled,
       password: this.password,
-      ai_point: this.ai_point
     }
   }
 

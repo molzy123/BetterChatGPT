@@ -25,7 +25,7 @@ const AiBotItemUI = (data: AiBotItemUIProps) => {
     <div className=' w-[200px]  bg-gray-200 h-[100px] ' onClick={handleClick}>
       <div className='flex flex-col'>
         <div className='text-gray-700'>{data.aiBot.name}</div>
-        <div className='text-gray-700'>{data.aiBot.summary}</div>
+        <div className='text-gray-700'>{data.aiBot.description}</div>
       </div>
     </div>
   );

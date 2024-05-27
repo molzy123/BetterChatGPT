@@ -4,6 +4,7 @@ import me from '@components/Menu/MenuOptions/Me';
 import { Locator } from '@src/common/data/Locator';
 import { UserService } from '@src/user/mgr/UserService';
 import { parseChunk } from '@api/helper';
+import { ApiResponse } from '@src/ai/mgr/AiApi';
 
 interface IRpcRequest {
   // 请求路径
@@ -97,11 +98,11 @@ abstract class AbstractRpc implements IRpcRequest {
 }
 
 export class BaseRpcRequest extends AbstractRpc {
-  success: (response: any) => void;
+  success: (response: ApiResponse) => void;
 
   constructor(
     path: string,
-    success: (response: any) => void,
+    success: (response: ApiResponse) => void,
     method?: string,
     body?: any,
     header?: Record<string, string>,
@@ -128,13 +129,13 @@ export class BaseRpcRequest extends AbstractRpc {
     if (response == undefined) {
       return;
     }
+    const respData = await response.json();
     if (!response.ok) {
-      const error = await response.json();
-      error.status = response.status;
-      handleErrorStatus(JSON.stringify(error));
+      respData.status = response.status;
+      handleErrorStatus(JSON.stringify(respData));
       return;
     }
-    this.success(await response.json());
+    this.success(respData.data);
   }
 }
 
@@ -188,7 +189,7 @@ export class StreamRpcRequest extends AbstractRpc {
       let partial = '';
       while (true) {
         const { done, value } = await reader.read(); // 读取流中的数据
-        const result = parseChunk(partial + new TextDecoder().decode(value)); // 解析事件源中的数据
+        const result = parseChunk(partial + new TextDecoder().decode(value)); // 解析事件源中的数据        
         partial = '';
         if (result === '[DONE]' || done) break;
 

@@ -10,25 +10,17 @@ import useStore from '@store/store';
 import { Locator } from '@src/common/data/Locator';
 import { AIService } from '@src/ai/mgr/AIService';
 import { AiBot } from '@src/ai/data/AiBot';
+import { PopupService } from '@src/common/Popup/PopupService';
+import { WeakObjectEvent, useBindObjectEvent } from '@src/common/Event/WeakObjectEventService';
 
-interface CreateAiBotUIProps {
-  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-const CreateAiBotUI = (data:CreateAiBotUIProps) => {
-  const aiBotCreate = useRef(new AiBot());
-  const [_name, _setName] = useState<string>(aiBotCreate.current.name);
-  const [_summary, _setSummary] = useState<string>(aiBotCreate.current.summary);
-  const [_model, _setModel] = useState<string>(aiBotCreate.current.config.model);
-  const [_topP, _setTopP] = useState<number>(aiBotCreate.current.config.top_p);
-  const [_frequencyPenalty, _setFrequencyPenalty] = useState<number>(aiBotCreate.current.config.frequency_penalty);
-  const [_presencePenalty,_setPresencePenalty ] = useState<number>(aiBotCreate.current.config.presence_penalty);
-  const [_n, _setN] = useState<number>(aiBotCreate.current.config.n);
+const CreateAiBotUI = ({aiBot} :{aiBot:AiBot}) => {
+  console.log(aiBot);
+  useBindObjectEvent(aiBot)
   const models = [{name:'gpt-3.5-turbo' },{name:"gpt-4"}]
-  const accessToken =  useStore((state) => state.userToken);
   const aiService = Locator.fetch(AIService)
   const handleConfirm = async () => {
-    aiService.createAiBot(aiBotCreate.current.toJson())
+    aiService.createAiBot(aiBot.toJson())
+    Locator.fetch(PopupService).hidePopup()
   };
 
   const [activeTab, setActiveTab] = useState(0);
@@ -37,7 +29,7 @@ const CreateAiBotUI = (data:CreateAiBotUIProps) => {
   return (
     <PopupModal
       title={"Create AI Bot"}
-      setIsModalOpen={data.setIsModalOpen}
+      setIsModalOpen={()=>{Locator.fetch(PopupService).hidePopup()}}
       handleConfirm={handleConfirm}
       handleClickBackdrop={handleConfirm}
     >
@@ -55,14 +47,20 @@ const CreateAiBotUI = (data:CreateAiBotUIProps) => {
           {activeTab === 0 && (
             <div>
               <CommonTextInput hintText="name" onChange={(name)=>{
-                _setName(name);
-                aiBotCreate.current.name = name;
-              }} value={_name}></CommonTextInput>
+                console.log(name);
+                
+                aiBot.name = name;
+                WeakObjectEvent.fire(aiBot);
+              }} value={aiBot.name}></CommonTextInput>
 
               <CommonTextInput hintText="summary" onChange={(summary)=>{
-                _setSummary(summary);
-                aiBotCreate.current.summary = summary;
-              }} value={_summary}></CommonTextInput>
+                aiBot.description = summary;
+                WeakObjectEvent.fire(aiBot);
+              }} value={aiBot.description}></CommonTextInput>
+
+              <CommonTextInput hintText="prompt" onChange={(prompt)=>{
+                WeakObjectEvent.fire(aiBot);
+              }} value={aiBot.description}></CommonTextInput>
 
 
             </div>
@@ -70,27 +68,27 @@ const CreateAiBotUI = (data:CreateAiBotUIProps) => {
             {activeTab === 1 && (
               <div>
                 <CommonSelector defaultIndex={models.findIndex((item,index)=>{
-                  return item.name == aiBotCreate.current.config.model;
+                  return item.name == aiBot.config.model;
                 })} items={models} selectChange={(item)=>{
-                  _setModel(item.name);
-                  aiBotCreate.current.config.model = item.name;
+                  aiBot.config.model = item.name;
+                  WeakObjectEvent.fire(aiBot);
                 }}/>
 
-                <CommonSlider value={_topP} onChange={(value)=>{
-                  aiBotCreate.current.config.top_p = value;
-                  _setTopP(value);
+                <CommonSlider value={aiBot.config.top_p} onChange={(value)=>{
+                  aiBot.config.top_p = value;
+                  WeakObjectEvent.fire(aiBot);
                 }} min={0} max={1} step={0.05} label={"top_p"} />
-                <CommonSlider value={_presencePenalty} onChange={(value)=>{
-                  aiBotCreate.current.config.presence_penalty = value;
-                  _setPresencePenalty(value);
+                <CommonSlider value={aiBot.config.presence_penalty} onChange={(value)=>{
+                  aiBot.config.presence_penalty = value;
+                  WeakObjectEvent.fire(aiBot);
                 }} min={-2} max={2} step={0.1} label={"PresencePenalty"} />
-                <CommonSlider value={_frequencyPenalty} onChange={(value)=>{
-                  aiBotCreate.current.config.frequency_penalty = value;
-                  _setFrequencyPenalty(value);
+                <CommonSlider value={aiBot.config.frequency_penalty} onChange={(value)=>{
+                  aiBot.config.frequency_penalty = value;
+                  WeakObjectEvent.fire(aiBot);
                 }} min={-2} max={2} step={0.1} label={"FrequencyPenalty"} />
-                <CommonSlider value={_n} onChange={(value)=>{
-                  aiBotCreate.current.config.n = value;
-                  _setN(value);
+                <CommonSlider value={aiBot.config.n} onChange={(value)=>{
+                  aiBot.config.n = value;
+                  WeakObjectEvent.fire(aiBot);
                 }} min={1} max={32} step={1} label={"n"} />
               </div>
             )}

@@ -5,7 +5,7 @@ import { EventService } from '@src/common/Event/EventService';
 import { EventEnum } from '@src/common/Event/EventEnum';
 import { AbstractModule } from '../data/AbstractModule';
 
-type DynamicComponentProps = any;
+export type DynamicComponentProps = any;
 
 export interface DynamicComponentState {
   Component: FunctionComponent<DynamicComponentProps> ;
@@ -19,7 +19,7 @@ export class PopupService extends AbstractModule
   popupList:DynamicComponentState[] = [];
   popupSet:Set<FunctionComponent> = new Set()
 
-  public showPopup(component:FunctionComponent,props?:DynamicComponentProps):number
+  public showPopup(component:any,props?:DynamicComponentProps):number
   {
     props = props || {}
     const popup = {Component:component,props:props}
@@ -28,7 +28,7 @@ export class PopupService extends AbstractModule
     return this.popupList.length
   }
 
-  public showPopupOnce(component:FunctionComponent,props?:DynamicComponentProps)
+  public showPopupOnce(component:any,props?:DynamicComponentProps)
   {
     if(this.popupSet.has(component))
       {

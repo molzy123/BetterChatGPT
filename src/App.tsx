@@ -13,6 +13,7 @@ import { PopupService } from './common/Popup/PopupService';
 import UserLogin from './user/components/UserLogin';
 import Chat from './ai/components/chat/Chat';
 import { AIService } from './ai/mgr/AIService';
+import EnglishWordMain from './english_word/EnglishWordMain';
 function App() {
   const setTheme = useStore((state) => state.setTheme); // 获取设置主题的函数
   const tabs = ['Tab1', 'Tab2', 'Tab3'];
@@ -91,7 +92,7 @@ function App() {
             </div>
           </div>}
         {activeTab === 'Tab2' && <UserInfo/>  }
-        {activeTab === 'Tab3' && <div>Content for Tab 3</div>}
+        {activeTab === 'Tab3' && <EnglishWordMain/> }
       </main>
     </div>
   );

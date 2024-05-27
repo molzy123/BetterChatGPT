@@ -16,7 +16,7 @@ const PopupModal = ({
 }: {
   title?: string;
   message?: string;
-  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsModalOpen: (value: boolean) => void;
   handleConfirm?: () => void;
   handleClose?: () => void;
   handleClickBackdrop?: () => void;

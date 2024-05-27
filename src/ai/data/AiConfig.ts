@@ -2,7 +2,7 @@ import { ModelOptions } from '../../../../BetterChatGPT/src/types/chat';
 import { IAiConfigDef } from './AIDef';
 
 export class AiConfig {
-  model: ModelOptions;
+  model: string;
   max_tokens: number;
   temperature: number;
   top_p: number;
@@ -30,7 +30,7 @@ export class AiConfig {
     }
   }
 
-  constructor(model: ModelOptions = 'gpt-3.5-turbo', max_tokens: number = 4096, temperature: number = 0.5, top_p: number = 1, presence_penalty: number = 0, frequency_penalty: number = 0, n: number = 1, seed?: number, stream?: boolean) {
+  constructor(model: string = 'gpt-3.5-turbo', max_tokens: number = 4096, temperature: number = 0.5, top_p: number = 1, presence_penalty: number = 0, frequency_penalty: number = 0, n: number = 1, seed?: number, stream?: boolean) {
     this.model = model;
     this.max_tokens = max_tokens;
     this.temperature = temperature;

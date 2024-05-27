@@ -10,6 +10,7 @@ import MyBotUI from '@src/ai/ui/MyBotUI';
 import { Locator } from '@src/common/data/Locator';
 import { PopupService } from '@src/common/Popup/PopupService';
 import { AIService } from '@src/ai/mgr/AIService';
+import { AiBot } from '@src/ai/data/AiBot';
 
 const NewChat = ({ folder }: { folder?: string }) =>
 {
@@ -57,11 +58,10 @@ const NewChat = ({ folder }: { folder?: string }) =>
 
       <a onClick={() =>
       {
-        setNewBot(true);
+        Locator.fetch(PopupService).showPopupOnce(CreateAiBotUI,{ aiBot:new AiBot()});
       }} className={'cursor-pointer opacity-100 border border-white/20 rounded-md mx-1 items-center text-gray-100'}>
         New Bot
       </a>
-      {newBot && <CreateAiBotUI setIsModalOpen={setNewBot} />}
     </div>
 
   );

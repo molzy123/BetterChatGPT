@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import useInitialiseNewChat from '@hooks/useInitialiseNewChat';
 
@@ -15,6 +15,10 @@ import { useBindEventRefresh } from '@src/common/Event/EventService';
 import { EventEnum } from '@src/common/Event/EventEnum';
 import { useBindObjectEvent } from '@src/common/Event/WeakObjectEventService';
 import { AiBot } from '@src/ai/data/AiBot';
+import RightClickMenu, { MenuItemData, RightClickMenuProps } from './RightClickMenu';
+import { ContextMenuService } from '@src/common/ContextMenu/ContextMenuService';
+import { MenuItem } from 'electron';
+import StarIcon from '@icon/StarIcon';
 
 const ChatHistoryClass = {
   normal:
@@ -28,17 +32,13 @@ const ChatHistoryClass = {
 };
 
 const ChatHistory = React.memo(
-  ({ currentAiBot, chat, chatIndex, active }: { currentAiBot:AiBot ;chat: AiChat; chatIndex: number; active:boolean }) => {
+  ({ currentAiBot, chat, active }: { currentAiBot:AiBot ;chat: AiChat; active:boolean }) => {
+    useBindObjectEvent(chat)
     const generating = useStore((state) => state.generating);
-
     const [isDelete, setIsDelete] = useState<boolean>(false);
     const [isEdit, setIsEdit] = useState<boolean>(false);
-    const [_title, _setTitle] = useState<string>(chat.title);
-    useBindObjectEvent(chat)
     const inputRef = useRef<HTMLInputElement>(null);
-
     const editTitle = () => {
-      chat.title = _title;
       setIsEdit(false);
     };
 
@@ -56,7 +56,6 @@ const ChatHistory = React.memo(
 
     const handleTick = (e: React.MouseEvent<HTMLButtonElement>) => {
       e.stopPropagation();
-
       if (isEdit) editTitle();
       else if (isDelete) deleteChat();
     };
@@ -67,10 +66,25 @@ const ChatHistory = React.memo(
     };
 
 
+    const handleRightClick = useCallback((event: React.MouseEvent<HTMLElement>) => {
+      // 阻止默认的上下文菜单显示
+      event.preventDefault();
+      var itemList: MenuItemData[] = []
+      itemList.push({name:'set Template',action:()=>{
+        currentAiBot.setTemplate(chat);
+      }})
+      var props:RightClickMenuProps = {
+        menuItemList:itemList
+      }
+      Locator.fetch(ContextMenuService).showContextMenu(RightClickMenu, event, props);
+    }, []);
+
     useEffect(() => {
       if (inputRef && inputRef.current) inputRef.current.focus();
     }, [isEdit]);
 
+    console.log("isTemplate",chat.isTemplate);
+    
     return (
       <a
         className={`${
@@ -79,29 +93,31 @@ const ChatHistory = React.memo(
           generating
             ? 'cursor-not-allowed opacity-40'
             : 'cursor-pointer opacity-100'
-        }`}
+        }`
+      }
         onClick={() => {
           if (!generating)
           {
             currentAiBot.currentChat = chat;
           } 
         }}
+        onContextMenu={handleRightClick}
       >
         <ChatIcon />
-        <div className='flex-1 text-ellipsis max-h-5 overflow-hidden break-all relative' title={chat.title}>
+        <div className=' flex-1 text-ellipsis max-h-5 overflow-hidden break-all relative' title={chat.title}>
           {isEdit ? (
             <input
               type='text'
               className='focus:outline-blue-600 text-sm border-none bg-transparent p-0 m-0 w-full'
-              value={_title}
+              value={chat.title}
               onChange={(e) => {
-                _setTitle(e.target.value);
+                chat.title = e.target.value;
               }}
               onKeyDown={handleKeyDown}
               ref={inputRef}
             />
           ) : (
-            _title
+            chat.title
           )}
 
           {isEdit || (
@@ -148,6 +164,9 @@ const ChatHistory = React.memo(
                   aria-label='delete chat'
                 >
                   <DeleteIcon />
+                </button>
+                <button className='p-1 hover:text-white'>
+                { chat.isTemplate &&  <StarIcon />}
                 </button>
               </>
             )}

@@ -1,21 +1,19 @@
-import type { IAiBotDef, IAiChatDef, IAiConfigDef } from '@src/ai/data/AIDef';
+import type { IAiBotDef, IAiBotUpdateDef, IAiChatDef, IAiConfigDef } from '@src/ai/data/AIDef';
 import { AiChat } from '@src/ai/data/AIChat';
 import { AiConfig } from '@src/ai/data/AiConfig';
 import { AiApi } from '@src/ai/mgr/AiApi';
-import { EventService } from '@src/common/Event/EventService';
-import { EventEnum } from '@src/common/Event/EventEnum';
 import { WeakObjectEvent } from '@src/common/Event/WeakObjectEventService';
-
-
-
 
 export class AiBot
 {
-  id: string = "";
-  user_id: string|undefined;
+  
+  id: number = 0;
+  userId: string|undefined;
   name: string = "机器人";
-  summary: string = "简单描述";
+  description: string = "简单描述";
   config: AiConfig = new AiConfig();
+  templateChat?: AiChat;
+  templateId?: string;
   private _chatList?: AiChat[] | undefined;
   public get chatList(): AiChat[] | undefined {
     return this._chatList;
@@ -52,11 +50,13 @@ export class AiBot
   {
     const result = new AiBot();
     result.id = json.id;
-    result.user_id = json.user_id;
+    result.userId = json.userId;
     result.name = json.name;
-    result.summary = json.summary;
+    result.description = json.description;
     result.config = AiConfig.fromJson(json.config);
     result.initialize();
+    console.log("templateId",json.templateId);
+    result.templateId = json.templateId;
     return result;
   }
 
@@ -64,10 +64,11 @@ export class AiBot
   {
     return {
       id: this.id,
-      user_id: this.user_id??"",
+      userId: this.userId??"",
       name: this.name,
-      summary: this.summary,
+      description: this.description,
       config: this.config,
+      templateId: this.templateChat?.id??""
     };
   }
 
@@ -86,6 +87,8 @@ export class AiBot
     {
       return AiChat.fromJson(item);
     });
+    this.templateChat = this.chatList.find((chat) => chat.id == this.templateId);
+    this.templateChat?.setTemplate(true); 
     this.currentChat = this.chatList[0];
   };
 
@@ -107,27 +110,50 @@ export class AiBot
     
   }
 
-  public newChat()
+   public async newChat():Promise<AiChat | undefined>
   {
     if(this.chatList == undefined)return;
-    const defaultChat = new AiChat( "", this, "新对话", [], "", "")
-    AiApi.createAiChat(defaultChat.toJson(),()=>{
-      this.chatList?.push(defaultChat);
+    const templateChat = this.templateChat;
+    var chat:AiChat;
+    if(templateChat)
+    {
+      chat = templateChat.clone();
+    }else{
+      chat = new AiChat( "", this, "New", [], "", "")
+    }
+    console.log("newChat",chat.toJson());
+    
+    await AiApi.createAiChat(chat.toJson(),(data:IAiChatDef)=>{
+      console.log("createAiChat",data);
+      chat = AiChat.fromJson(data)
+      this.chatList?.unshift(chat);
+      this.currentChat = chat;
       WeakObjectEvent.fire(this)
     })
+    return chat;
   }
 
   public cloneCurrentChat()
   {
-    const chatDef = this.currentChat?.toJson();
-    if (chatDef)
+    if(this.currentChat)
     {
-      const chat = AiChat.fromJson(chatDef);
-      this.chatList?.push(chat);
-      this.currentChat = chat;
-      AiApi.createAiChat(chatDef,()=>{
+      const chat = this.currentChat.clone();
+      AiApi.createAiChat(chat.toJson(),(response:IAiChatDef)=>{
+        this.chatList?.unshift(AiChat.fromJson(response));
         WeakObjectEvent.fire(this)
       })
     }
+  }
+  setTemplate(chat: AiChat) {
+    const updateDef:IAiBotUpdateDef = {
+      id: this.id,
+      templateId: chat.id
+    }
+    AiApi.setTemplate(updateDef,()=>{
+      this.templateChat?.setTemplate(false);
+      chat.setTemplate(true);
+      this.templateChat = chat;
+      WeakObjectEvent.fire(this)
+    })
   }
 }

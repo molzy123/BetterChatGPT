@@ -40,7 +40,6 @@ const ContentView = memo(
     message:AiChatMessage;
     setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
   }) => {
-    const { handleSubmit } = useSubmit();
     const [isDelete, setIsDelete] = useState<boolean>(false);
     const inlineLatex = useStore((state) => state.inlineLatex);
     const markdownMode = useStore((state) => state.markdownMode);
@@ -143,7 +142,7 @@ const ContentView = memo(
   }
 );
 
-const code = memo((props: CodeProps) => {
+export const code = memo((props: CodeProps) => {
   const { inline, className, children } = props;
   const match = /language-(\w+)/.exec(className || '');
   const lang = match && match[1];
@@ -155,7 +154,7 @@ const code = memo((props: CodeProps) => {
   }
 });
 
-const p = memo(
+export const p = memo(
   (
     props?: Omit<
       DetailedHTMLProps<

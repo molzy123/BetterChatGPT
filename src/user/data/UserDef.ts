@@ -1,3 +1,4 @@
+import { IAiBotDef } from '@src/ai/data/AIDef';
 
 
 export interface UserDef
@@ -5,7 +6,13 @@ export interface UserDef
   id:string
   username: string,
   email: string
-  disabled:  boolean
   password: string
-  ai_point: number
+}
+
+export interface UserAllDef
+{
+  id:string
+  username: string,
+  email: string
+  bots:IAiBotDef[]
 }

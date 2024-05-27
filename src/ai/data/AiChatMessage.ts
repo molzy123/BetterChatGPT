@@ -3,10 +3,12 @@ import { Role } from '../../../../BetterChatGPT/src/types/chat';
 import { IAiChatMessageDef } from './AIDef';
 import { AIService } from '../mgr/AIService';
 import { WeakObjectEvent } from '@src/common/Event/WeakObjectEventService';
+import { AiChat } from './AIChat';
 
 
 export class AiChatMessage{
   name?: string;
+  chat:AiChat;
   private _role: Role = "user";
   public get role(): Role {
     return this._role;
@@ -24,14 +26,15 @@ export class AiChatMessage{
     this.update()
   }
 
-  constructor( role: Role, content: string,name?:string) {
+  constructor( role: Role, content: string,chat:AiChat,name?:string,) {
     this.role = role;
     this.content = content;
     this.name = name;
+    this.chat = chat;
   }
 
-  static fromJson(json: IAiChatMessageDef): AiChatMessage {
-    return new AiChatMessage(json.role, json.content,json.name);
+  static fromJson(json: IAiChatMessageDef, chat:AiChat): AiChatMessage {
+    return new AiChatMessage(json.role, json.content,chat,json.name);
   }
 
   public toJson(): IAiChatMessageDef {
@@ -51,6 +54,11 @@ export class AiChatMessage{
       return chat.messages[chat.messages.length-1] == this;
     }
     return false;
+  }
+
+  public save()
+  {
+    this.chat.updateChat();
   }
 
   public update()

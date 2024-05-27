@@ -67,6 +67,7 @@ const EditView = ({
     } else {
       message.content = _content
       setIsEdit(false);
+      message.save()
     }
   };
 
