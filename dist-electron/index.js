@@ -1086,8 +1086,8 @@ Please double check that your authentication token is correct. Due to security r
         resolve();
         return;
       }
-      const code = (_a = response.statusCode) !== null && _a !== void 0 ? _a : 0;
-      const shouldRedirect = code >= 300 && code < 400;
+      const code2 = (_a = response.statusCode) !== null && _a !== void 0 ? _a : 0;
+      const shouldRedirect = code2 >= 300 && code2 < 400;
       const redirectUrl = safeGetHeader(response, "location");
       if (shouldRedirect && redirectUrl != null) {
         if (redirectCount > this.maxRedirects) {
@@ -3306,9 +3306,9 @@ function requireOut() {
       }
     }
     exports.asArray = asArray;
-    function newError(message, code) {
+    function newError(message, code2) {
       const error = new Error(message);
-      error.code = code;
+      error.code = code2;
       return error;
     }
     exports.newError = newError;
@@ -6394,12 +6394,12 @@ var BASE64_MAP = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789
 function resolveYamlBinary(data) {
   if (data === null)
     return false;
-  var code, idx, bitlen = 0, max = data.length, map2 = BASE64_MAP;
+  var code2, idx, bitlen = 0, max = data.length, map2 = BASE64_MAP;
   for (idx = 0; idx < max; idx++) {
-    code = map2.indexOf(data.charAt(idx));
-    if (code > 64)
+    code2 = map2.indexOf(data.charAt(idx));
+    if (code2 > 64)
       continue;
-    if (code < 0)
+    if (code2 < 0)
       return false;
     bitlen += 6;
   }
@@ -6649,9 +6649,9 @@ function charFromCodepoint(c) {
 }
 var simpleEscapeCheck = new Array(256);
 var simpleEscapeMap = new Array(256);
-for (var i = 0; i < 256; i++) {
-  simpleEscapeCheck[i] = simpleEscapeSequence(i) ? 1 : 0;
-  simpleEscapeMap[i] = simpleEscapeSequence(i);
+for (var i$1 = 0; i$1 < 256; i$1++) {
+  simpleEscapeCheck[i$1] = simpleEscapeSequence(i$1) ? 1 : 0;
+  simpleEscapeMap[i$1] = simpleEscapeSequence(i$1);
 }
 function State$1(input, options) {
   this.input = input;
@@ -7723,7 +7723,7 @@ function loadAll(input, iterator2, options) {
     iterator2(documents[index]);
   }
 }
-function load(input, options) {
+function load$2(input, options) {
   var documents = loadDocuments(input, options);
   if (documents.length === 0) {
     return void 0;
@@ -7733,7 +7733,7 @@ function load(input, options) {
   throw new YAMLException$1("expected a single document in the stream, but found more");
 }
 loader$1.loadAll = loadAll;
-loader$1.load = load;
+loader$1.load = load$2;
 var dumper$1 = {};
 var common = common$5;
 var YAMLException = exception;
@@ -14171,6 +14171,118 @@ function requireMain() {
   })(main$1);
   return main$1;
 }
+var load$1 = {};
+Object.defineProperty(load$1, "__esModule", { value: true });
+load$1.load = void 0;
+const lookup = [];
+const code = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+for (var i = 0, len = code.length; i < len; ++i) {
+  lookup[i] = code[i];
+}
+function tripletToBase64(num) {
+  return lookup[num >> 18 & 63] + lookup[num >> 12 & 63] + lookup[num >> 6 & 63] + lookup[num & 63];
+}
+function encodeChunk(uint8, start, end) {
+  var tmp;
+  var output = [];
+  for (var i = start; i < end; i += 3) {
+    tmp = (uint8[i] << 16 & 16711680) + (uint8[i + 1] << 8 & 65280) + (uint8[i + 2] & 255);
+    output.push(tripletToBase64(tmp));
+  }
+  return output.join("");
+}
+function fromByteArray(uint8) {
+  var tmp;
+  var len = uint8.length;
+  var extraBytes = len % 3;
+  var parts = [];
+  var maxChunkLength = 16383;
+  for (var i = 0, len2 = len - extraBytes; i < len2; i += maxChunkLength) {
+    parts.push(encodeChunk(uint8, i, i + maxChunkLength > len2 ? len2 : i + maxChunkLength));
+  }
+  if (extraBytes === 1) {
+    tmp = uint8[len - 1];
+    parts.push(lookup[tmp >> 2] + lookup[tmp << 4 & 63] + "==");
+  } else if (extraBytes === 2) {
+    tmp = (uint8[len - 2] << 8) + uint8[len - 1];
+    parts.push(lookup[tmp >> 10] + lookup[tmp >> 4 & 63] + lookup[tmp << 2 & 63] + "=");
+  }
+  return parts.join("");
+}
+function is_printable(u2) {
+  return !(u2 <= 31 || u2 >= 127 && u2 <= 160 || u2 == 173);
+}
+function data_gym_to_mergeable_bpe_ranks(vocal_bpe_contents, encoder_json_contents) {
+  const rank_to_intbyte = Array.from({ length: 2 ** 8 }, (_, i) => i).filter((i) => is_printable(i) && String.fromCharCode(i) !== " ");
+  const data_gym_byte_to_byte = rank_to_intbyte.reduce((memo, item) => {
+    memo[String.fromCharCode(item)] = item;
+    return memo;
+  }, {});
+  let n = 0;
+  for (let b = 0; b < 2 ** 8; b++) {
+    if (!rank_to_intbyte.includes(b)) {
+      rank_to_intbyte.push(b);
+      data_gym_byte_to_byte[String.fromCharCode(2 ** 8 + n)] = b;
+      n += 1;
+    }
+  }
+  if (rank_to_intbyte.length !== 2 ** 8) {
+    throw new Error("rank_to_intbyte.length must be 2**8");
+  }
+  const bpe_merges = vocal_bpe_contents.split("\n").slice(1, -1).map((merge_str) => merge_str.split(" "));
+  function decode_data_gym(value) {
+    return value.split("").map((b) => data_gym_byte_to_byte[b]);
+  }
+  const bpe_ranks = Object.fromEntries(rank_to_intbyte.map((b, i) => [b, i]));
+  n = rank_to_intbyte.length;
+  for (const [first, second] of bpe_merges) {
+    bpe_ranks[[...decode_data_gym(first), ...decode_data_gym(second)].join(",")] = n;
+    n += 1;
+  }
+  const encoder_json = JSON.parse(encoder_json_contents);
+  const encoder_json_loaded = Object.fromEntries(Object.entries(encoder_json).map(([k, v]) => [
+    decode_data_gym(k).join(","),
+    v
+  ]));
+  delete encoder_json_loaded[decode_data_gym("<|endoftext|>").join(",")];
+  delete encoder_json_loaded[decode_data_gym("<|startoftext|>").join(",")];
+  function normalize_map(items) {
+    return JSON.stringify(Object.keys(items).sort().map((key) => [key, items[key]]));
+  }
+  if (normalize_map(bpe_ranks) !== normalize_map(encoder_json_loaded)) {
+    throw new Error("bpe_ranks !== encoder_json_loaded");
+  }
+  return bpe_ranks;
+}
+function dump_tiktoken_bpe(bpe_ranks) {
+  return Object.entries(bpe_ranks).sort((a, b) => a[1] - b[1]).map(([token_str, rank]) => [
+    fromByteArray(token_str.split(",").map((i) => Number.parseInt(i, 10))),
+    rank
+  ].join(" ")).join("\n") + "\n";
+}
+async function load(registry, customFetch) {
+  const ofetch = customFetch ? customFetch : (url) => fetch(url).then((r) => r.text());
+  if ("data_gym_to_mergeable_bpe_ranks" in registry) {
+    const [vocab_bpe, encoder_json] = await Promise.all([
+      ofetch(registry.data_gym_to_mergeable_bpe_ranks.vocab_bpe_file),
+      ofetch(registry.data_gym_to_mergeable_bpe_ranks.encoder_json_file)
+    ]);
+    return {
+      explicit_n_vocab: registry.explicit_n_vocab,
+      pat_str: registry.pat_str,
+      special_tokens: registry.special_tokens,
+      bpe_ranks: dump_tiktoken_bpe(data_gym_to_mergeable_bpe_ranks(vocab_bpe, encoder_json))
+    };
+  } else {
+    return {
+      explicit_n_vocab: registry.explicit_n_vocab,
+      pat_str: registry.pat_str,
+      special_tokens: registry.special_tokens,
+      bpe_ranks: await ofetch(registry.load_tiktoken_bpe)
+    };
+  }
+}
+load$1.load = load;
 var srcExports = {};
 var src = {
   get exports() {
@@ -14698,6 +14810,7 @@ const isDev = electronIsDev;
 const { autoUpdater } = requireMain();
 const { log } = require$$4$2;
 let win = null;
+let alert = null;
 const instanceLock = app.requestSingleInstanceLock();
 const isMacOS = process.platform === "darwin";
 if (electronSquirrelStartup)
@@ -14824,15 +14937,34 @@ function createWindow() {
       // 禁用沙箱
     }
   });
+  alert = new BrowserWindow({
+    autoHideMenuBar: true,
+    show: false,
+    height: 300,
+    width: 300,
+    icon: assetPath(ICON),
+    frame: false,
+    transparent: true,
+    webPreferences: {
+      nodeIntegration: true,
+      // 启用 Node.js 集成
+      contextIsolation: false
+      // 禁用沙箱
+    }
+  });
+  alert.loadURL("http://localhost:5173/alert");
+  alert.on("focus", () => {
+    alert.setAlwaysOnTop(true);
+  });
+  alert.on("blur", () => {
+  });
   createTray(win);
   win.show();
   log("is dev", isDev);
   createServer();
   const startUrl = isDev ? `http://localhost:${PORT}/` : `file://${path.join(__dirname, "../dist/index.html")}`;
   win.loadURL(startUrl);
-  if (isDev) {
-    win.webContents.openDevTools({ mode: "detach" });
-  }
+  win.webContents.openDevTools({ mode: "detach" });
   setupLinksLeftClick(win);
   setupContextMenu(win);
   return win;
@@ -14890,7 +15022,10 @@ if (!instanceLock) {
   });
   app.whenReady().then(() => {
     win = createWindow();
-    ipcMain.handle("ping", () => "pong");
+    ipcMain.on("alert-pin", (event) => {
+      log("alert-pin");
+      alert.setAlwaysOnTop(true);
+    });
   });
 }
 const createServer = () => {
@@ -14898,25 +15033,15 @@ const createServer = () => {
   const http = require$$3;
   const server = http.createServer((request, response) => {
     log(">>>>>>>>>>>>>>>>>>>listen");
-    if (request.method == "GET" && request.url === "/trigger") {
+    if (request.method == "POST" && request.url === "/trigger") {
       console.log("Triggering popup");
-      const alert = new BrowserWindow({
-        autoHideMenuBar: true,
-        show: false,
-        height: 300,
-        width: 300,
-        icon: assetPath(ICON),
-        webPreferences: {
-          nodeIntegration: true,
-          // 启用 Node.js 集成
-          contextIsolation: false
-          // 禁用沙箱
-        }
-      });
-      const startUrl = isDev ? `http://localhost:5173/alert` : `file://${path.join(__dirname, "../dist/index.html")}`;
-      alert.loadURL(startUrl);
       alert.show();
-      win.webContents.send("show-popup");
+      alert.focus();
+      let body = "";
+      request.on("data", (chunk) => {
+        body += chunk.toString();
+        alert.webContents.send("storage", { channel: "AI", message: body });
+      });
       response.writeHead(200, { "Content-Type": "application/json" });
       response.end(JSON.stringify({ message: "Popup triggered" }));
     }

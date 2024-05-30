@@ -53,7 +53,7 @@ export class AiChat {
     );
   }
 
-  public getLastMessage() {
+  public getLastMessage():AiChatMessage {
     return this.messages[this.messages.length - 1];
   }
 
@@ -182,6 +182,8 @@ export class AiChat {
     };
     this.addMessage('assistant', '');
     const lastMessage = this.getLastMessage();
+    console.log("generateChat");
+    
     AiApi.generateChat(
       arg,
       (data: IAiChatGenerateChunkDef) => {

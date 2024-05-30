@@ -88,6 +88,8 @@ export class AIService extends AbstractModule {
 
   public getBotById(id:number)
   {
+    console.log(">>>>>>aibotMap",this.aiBotMap);
+    
     return this.aiBotMap.get(id);
   }
 

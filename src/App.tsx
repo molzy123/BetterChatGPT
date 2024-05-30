@@ -14,36 +14,36 @@ import UserLogin from './user/components/UserLogin';
 import Chat from './ai/components/chat/Chat';
 import { AIService } from './ai/mgr/AIService';
 import EnglishWordMain from './english_word/EnglishWordMain';
-// const { ipcRenderer } = window.require('electron');
+const { ipcRenderer } = window.require('electron');
 function App() {
   const setTheme = useStore((state) => state.setTheme); // 获取设置主题的函数
   const tabs = ['Tab1', 'Tab2', 'Tab3'];
   const [activeTab, setActiveTab] = useState(tabs[0]);
-  const userToken = useRef<String>();
   const userService = Locator.fetch(UserService)
+  const [userToken,setUserToken] = useState<String>(userService.accessToken);
+  
   useBindEvent(EventEnum.LOGIN_STATE_CHANGE,(value:UserStateEnum)=>{
     if(value == UserStateEnum.LOGOUT){
       Locator.fetch(PopupService).showPopupOnce(UserLogin)
     }else if(value == UserStateEnum.LOGIN){
       Locator.fetch(PopupService).hidePopup()
     }
-    userToken.current = userService.accessToken;
+    setUserToken(userService.accessToken);
   })
 
   useEffect(() => {
-    userToken.current = userService.accessToken;
-    // console.log('Adding IPC listener for show-popup');
-    // ipcRenderer.on("show-popup", () => {
-    //   console.log('Received show-popup event');
-    //   alert('Popup triggered from server!');
-    //   Locator.fetch(PopupService).showPopupOnce(UserLogin);
-    // });
+    console.log('Adding IPC listener for show-popup');
+    ipcRenderer.on("AI", (event,arg) => {
+      console.log('Received show-popup event',arg);
+      // alert('Popup triggered from server!');
+      // Locator.fetch(PopupService).showPopupOnce(UserLogin);
+    });
 
-    // // Cleanup listener on component unmount
-    // return () => {
-    //   console.log('Removing IPC listener for show-popup');
-    //   ipcRenderer.removeAllListeners('show-popup');
-    // };
+    // Cleanup listener on component unmount
+    return () => {
+      console.log('Removing IPC listener for show-popup');
+      ipcRenderer.removeAllListeners('show-popup');
+    };
   }, []); // 空依赖数组，确保只在组件挂载和卸载时运行
   useBindEventRefresh(EventEnum.CURRENT_BOT_CHANGED)
   const currentAiBot = Locator.fetch(AIService).currentAiBot

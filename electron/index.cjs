@@ -17,7 +17,10 @@ const {
 const isDev = require('electron-is-dev');
 const { autoUpdater } = require('electron-updater');
 const { log } = require("node:console");
+const { load } = require("@dqbd/tiktoken/load");
 let win = null;
+
+let alert =null;
 const instanceLock = app.requestSingleInstanceLock();
 const isMacOS = process.platform === 'darwin';
 
@@ -159,6 +162,32 @@ function createWindow() {
     }
   });
 
+  alert = new BrowserWindow({
+    autoHideMenuBar: true,
+    show: false,
+    height: 300,
+    width: 300,
+    icon: assetPath(ICON),
+    frame:false,
+    transparent:true,
+    webPreferences:{
+      nodeIntegration: true, // 启用 Node.js 集成
+      contextIsolation: false, // 禁用沙箱
+    }
+  });
+  alert.loadURL("http://localhost:5173/alert");
+
+  alert.on("focus",()=>{
+    alert.setAlwaysOnTop(true);
+  })
+  alert.on("blur",()=>{
+    // alert.setAlwaysOnTop(false);
+    // alert.hide();
+  })
+
+  
+
+  // alert.show();
   createTray(win);
 
   // win.maximize();
@@ -172,9 +201,9 @@ function createWindow() {
   win.loadURL(startUrl);
   // win.loadFile('./index.html');
 
-  if (isDev) {
-    win.webContents.openDevTools({ mode: 'detach' });
-  }
+  // if (isDev) {
+  win.webContents.openDevTools({ mode: 'detach' });
+  // }
 
   setupLinksLeftClick(win);
   setupContextMenu(win);
@@ -244,7 +273,10 @@ if (!instanceLock) {
 
   app.whenReady().then(() => {
     win = createWindow();
-    ipcMain.handle("ping",()=>"pong")
+    ipcMain.on("alert-pin", (event) => {
+      log("alert-pin")
+      alert.setAlwaysOnTop(true);
+    });
   });
 }
 
@@ -268,27 +300,24 @@ const createServer = () => {
     '.json': 'application/json',
   };
 
+  
+
   // Create a http server
   const server = http.createServer((request, response) => {
     log(">>>>>>>>>>>>>>>>>>>listen")
-    if(request.method == "GET" && request.url === "/trigger")
+    if(request.method == "POST" && request.url === "/trigger")
     {
       console.log("Triggering popup"); // 添加日志
-      const alert = new BrowserWindow({
-        autoHideMenuBar: true,
-        show: false,
-        height: 300,
-        width: 300,
-        icon: assetPath(ICON),
-        webPreferences:{
-          nodeIntegration: true, // 启用 Node.js 集成
-          contextIsolation: false, // 禁用沙箱
-        }
-      });
-      const startUrl = isDev ? `http://localhost:5173/alert` : `file://${path.join(__dirname, '../dist/index.html')}`;
-      alert.loadURL(startUrl);
       alert.show();
-      win.webContents.send("show-popup");
+      alert.focus();
+      // 读取body内容
+      let body = "";
+      request.on('data', (chunk) => {
+        body += chunk.toString();
+        alert.webContents.send("storage",{channel:"AI",message:body});
+      });
+      // alert.webContents.openDevTools({ mode: 'detach' });
+      // win.webContents.send("show-popup");
       response.writeHead(200, { 'Content-Type': 'application/json' });
       response.end(JSON.stringify({ message: "Popup triggered" }));
     }

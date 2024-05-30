@@ -25,12 +25,14 @@ moduleClasses.forEach((moduleClass) => {
 })
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<AppMain><App /></AppMain>} />
-        <Route path="/alert" element={<TextShowWin/>}/>
-      </Routes>
-    </BrowserRouter>
-  </React.StrictMode>
+  // <React.StrictMode>
+    <AppMain>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<App />} />
+          <Route path="/alert" element={<TextShowWin/>}/>
+        </Routes>
+      </BrowserRouter>
+    </AppMain>
+  // </React.StrictMode>
 );

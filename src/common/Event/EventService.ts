@@ -1,5 +1,6 @@
 import { EventEnum } from '@src/common/Event/EventEnum';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 export const EventService = {
     eventMap: new Map<string, Function[]>(),
 
@@ -62,3 +63,8 @@ export function useBindEventRefresh(event:EventEnum)
     }
   , []);
 }
+
+const { ipcRenderer } = window.require('electron');
+ipcRenderer.on("AI", (event, data) => {
+  console.log("EventService",data);
+});

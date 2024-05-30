@@ -8,17 +8,17 @@ import { resolve } from 'path';
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react(), wasm(), topLevelAwait(),
-    // electron({
-    //   entry: 'electron/index.cjs',
-    // }),
-    // renderer({
-    //   resolve: {
-    //     // Ensure Node.js built-in modules are resolved correctly
-    //     path: { type: 'cjs' },
-    //     fs: { type: 'cjs' },
-    //     // Add other built-in modules if necessary
-    //   },
-    // }),
+    electron({
+      entry: 'electron/index.cjs',
+    }),
+    renderer({
+      resolve: {
+        // Ensure Node.js built-in modules are resolved correctly
+        path: { type: 'cjs' },
+        fs: { type: 'cjs' },
+        // Add other built-in modules if necessary
+      },
+    }),
   ],
   resolve: {
     alias: {
