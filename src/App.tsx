@@ -14,7 +14,7 @@ import UserLogin from './user/components/UserLogin';
 import Chat from './ai/components/chat/Chat';
 import { AIService } from './ai/mgr/AIService';
 import EnglishWordMain from './english_word/EnglishWordMain';
-const { ipcRenderer } = window.require('electron');
+// const { ipcRenderer } = window.require('electron');
 function App() {
   const setTheme = useStore((state) => state.setTheme); // 获取设置主题的函数
   const tabs = ['Tab1', 'Tab2', 'Tab3'];
@@ -32,18 +32,18 @@ function App() {
 
   useEffect(() => {
     userToken.current = userService.accessToken;
-    console.log('Adding IPC listener for show-popup');
-    ipcRenderer.on("show-popup", () => {
-      console.log('Received show-popup event');
-      alert('Popup triggered from server!');
-      Locator.fetch(PopupService).showPopupOnce(UserLogin);
-    });
+    // console.log('Adding IPC listener for show-popup');
+    // ipcRenderer.on("show-popup", () => {
+    //   console.log('Received show-popup event');
+    //   alert('Popup triggered from server!');
+    //   Locator.fetch(PopupService).showPopupOnce(UserLogin);
+    // });
 
-    // Cleanup listener on component unmount
-    return () => {
-      console.log('Removing IPC listener for show-popup');
-      ipcRenderer.removeAllListeners('show-popup');
-    };
+    // // Cleanup listener on component unmount
+    // return () => {
+    //   console.log('Removing IPC listener for show-popup');
+    //   ipcRenderer.removeAllListeners('show-popup');
+    // };
   }, []); // 空依赖数组，确保只在组件挂载和卸载时运行
   useBindEventRefresh(EventEnum.CURRENT_BOT_CHANGED)
   const currentAiBot = Locator.fetch(AIService).currentAiBot
