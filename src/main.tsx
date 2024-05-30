@@ -8,6 +8,8 @@ import './i18n';
 import AppMain from '@src/AppMain';
 import { moduleClasses } from './common/data/Modules';
 import { Locator } from './common/data/Locator';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import TextShowWin from './window/TextShowWin';
 
 moduleClasses.forEach((moduleClass) => {
   const module = new moduleClass();
@@ -22,16 +24,13 @@ moduleClasses.forEach((moduleClass) => {
   module.start();
 })
 
-useEffect(() => {
-  const dir = (window as any).api.getDirname();
-  console.log(dir);
-  
-}, [])
-
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <AppMain>
-      <App />
-    </AppMain>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<AppMain><App /></AppMain>} />
+        <Route path="/alert" element={<TextShowWin/>}/>
+      </Routes>
+    </BrowserRouter>
   </React.StrictMode>
 );

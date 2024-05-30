@@ -12,12 +12,15 @@ const {
   Menu,
   MenuItem,
   ipcMain,
+  ipcRenderer,
 } = require('electron');
 const isDev = require('electron-is-dev');
 const { autoUpdater } = require('electron-updater');
+const { log } = require("node:console");
 let win = null;
 const instanceLock = app.requestSingleInstanceLock();
 const isMacOS = process.platform === 'darwin';
+
 
 if (require('electron-squirrel-startup')) app.quit();
 
@@ -151,20 +154,23 @@ function createWindow() {
     show: false,
     icon: assetPath(ICON),
     webPreferences:{
-      preload: path.join(__dirname, 'preload.cjs'),
       nodeIntegration: true, // 启用 Node.js 集成
-      contextIsolation: false, // 禁用上下文隔离
+      contextIsolation: false, // 禁用沙箱
     }
   });
 
   createTray(win);
 
-  win.maximize();
+  // win.maximize();
   win.show();
 
-  isDev || createServer();
-
-  win.loadURL(`http://localhost:${PORT}`);
+  log("is dev",isDev)
+  // isDev || createServer();
+  createServer();
+ // Ensure Vite server is running before loading URL
+ const startUrl = isDev ? `http://localhost:${PORT}/` : `file://${path.join(__dirname, '../dist/index.html')}`;
+  win.loadURL(startUrl);
+  // win.loadFile('./index.html');
 
   if (isDev) {
     win.webContents.openDevTools({ mode: 'detach' });
@@ -243,6 +249,7 @@ if (!instanceLock) {
 }
 
 const createServer = () => {
+  const PORT = isDev ? '5174' : '51735'; // 使用不同的端口避免冲突
   // Dependencies
   const http = require('http');
   const fs = require('fs');
@@ -263,54 +270,31 @@ const createServer = () => {
 
   // Create a http server
   const server = http.createServer((request, response) => {
-    __dirname = window.api.getDirname();
+    log(">>>>>>>>>>>>>>>>>>>listen")
     if(request.method == "GET" && request.url === "/trigger")
     {
-      ipcMain.emit("show-popup");
+      console.log("Triggering popup"); // 添加日志
+      const alert = new BrowserWindow({
+        autoHideMenuBar: true,
+        show: false,
+        height: 300,
+        width: 300,
+        icon: assetPath(ICON),
+        webPreferences:{
+          nodeIntegration: true, // 启用 Node.js 集成
+          contextIsolation: false, // 禁用沙箱
+        }
+      });
+      const startUrl = isDev ? `http://localhost:5173/alert` : `file://${path.join(__dirname, '../dist/index.html')}`;
+      alert.loadURL(startUrl);
+      alert.show();
+      win.webContents.send("show-popup");
       response.writeHead(200, { 'Content-Type': 'application/json' });
       response.end(JSON.stringify({ message: "Popup triggered" }));
-    }else{
-      // Get the file path from the URL
-    let filePath =
-      request.url === '/'
-        ? `${path.join(__dirname, '../dist/index.html')}`
-        : `${path.join(__dirname, `../dist/${request.url}`)}`;
-
-    // Get the file extension from the filePath
-    let extname = path.extname(filePath);
-
-    // Set the default MIME type to text/plain
-    let contentType = 'text/plain';
-
-    // Check if the file extension is in the MIME types object
-    if (extname in mimeTypes) {
-      contentType = mimeTypes[extname];
     }
-
-    // Read the file from the disk
-    fs.readFile(filePath, (error, content) => {
-      if (error) {
-        // If file read error occurs
-        if (error.code === 'ENOENT') {
-          // File not found error
-          response.writeHead(404);
-          response.end('File Not Found');
-        } else {
-          // Server error
-          response.writeHead(500);
-          response.end(`Server Error: ${error.code}`);
-        }
-      } else {
-        // File read successful
-        response.writeHead(200, { 'Content-Type': contentType });
-        response.end(content, 'utf-8');
-      }
-    });
-    }
-
-    
   });
 
+  log(">>>>PORT",PORT)
   // Listen for request on port ${PORT}
   server.listen(PORT, () => {
     console.log(`Server listening on http://localhost:${PORT}/`);
