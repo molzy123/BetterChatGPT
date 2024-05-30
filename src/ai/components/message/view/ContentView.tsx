@@ -14,7 +14,6 @@ import remarkGfm from 'remark-gfm';
 import useStore from '@store/store';
 import TickIcon from '@icon/TickIcon';
 import CrossIcon from '@icon/CrossIcon';
-import useSubmit from '@hooks/useSubmit';
 import { codeLanguageSubset } from '@constants/chat';
 import UpButton from '../button/UpButton';
 import DownButton from '../button/DownButton';

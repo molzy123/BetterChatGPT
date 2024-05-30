@@ -1,8 +1,8 @@
 import React, { useRef, useState } from 'react';
 import DownChevronArrow from '@icon/DownChevronArrow';
-
+import {ModelOptions } from '@type/chat';
 interface CommonSelectorItem {
-  name: string;
+  name: ModelOptions;
 }
 
 interface CommonSelectorProps {

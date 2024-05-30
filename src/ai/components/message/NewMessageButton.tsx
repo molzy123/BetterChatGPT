@@ -8,7 +8,7 @@ const NewMessageButton = React.memo(
   ({ messageIndex }: { messageIndex: number }) => {
     const aiService = Locator.fetch(AIService);
     const addMessage = () => {
-      aiService.currentAiBot?.currentChat?.addMessage(new AiChatMessage("user", ""),messageIndex+1);
+      aiService.currentAiBot?.currentChat?.addMessage("user", "",messageIndex+1);
     };
     return (
       <div

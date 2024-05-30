@@ -2,13 +2,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import ScrollToBottom from 'react-scroll-to-bottom';
 import useStore from '@store/store';
 import ScrollToBottomButton from './ScrollToBottomButton';
-import ChatTitle from './ChatTitle';
 import NewMessageButton from '../message/NewMessageButton';
 import CrossIcon from '@icon/CrossIcon';
-import useSubmit from '@hooks/useSubmit';
 import DownloadChat from './DownloadChat';
 import CloneChat from './CloneChat';
-import ShareGPT from '@components/ShareGPT';
 import { AiChatMessage } from '@src/ai/data/AiChatMessage';
 import Message from '../message/Message';
 import { AiChat } from '@src/ai/data/AIChat';
@@ -28,8 +25,6 @@ const ChatContent = ({currentChat} :{currentChat:AiChat}) => {
     }
   }, [generating]);
 
-  const { error } = useSubmit();
-
   return (
     <>
     {<div className='flex-1 overflow-hidden'>
@@ -37,8 +32,6 @@ const ChatContent = ({currentChat} :{currentChat:AiChat}) => {
         <ScrollToBottomButton />
         <div className='flex flex-col items-center text-sm dark:bg-gray-800'>
           <div className='flex flex-col items-center text-sm dark:bg-gray-800 w-full' ref={saveRef}>
-            {/* 高级模式 */}
-            {advancedMode && <ChatTitle />}
             {/* 加号按钮，新增消息记录 */}
             {!generating && advancedMode && messages.length === 0 && (
               <NewMessageButton messageIndex={-1} />
@@ -56,11 +49,11 @@ const ChatContent = ({currentChat} :{currentChat:AiChat}) => {
             ))}
           </div>
           {/* 用户输入框 */}
-          <Message message={new AiChatMessage(inputRole,"","")} index={-1} sticky />
-          {error !== '' && (
+          <Message message={new AiChatMessage(inputRole,"",currentChat, "")} index={-1} sticky />
+          {(
             <div className='relative py-2 px-3 w-3/5 mt-3 max-md:w-11/12 border rounded-md border-red-500 bg-red-500/10'>
               <div className='text-gray-600 dark:text-gray-100 text-sm whitespace-pre-wrap'>
-                {error}
+                
               </div>
               <div
                 className='text-white absolute top-1 right-1 cursor-pointer'
@@ -77,7 +70,6 @@ const ChatContent = ({currentChat} :{currentChat:AiChat}) => {
             {useStore.getState().generating || (
               <div className='md:w-[calc(100%-50px)] flex gap-4 flex-wrap justify-center'>
                 <DownloadChat saveRef={saveRef} />
-                <ShareGPT />
                 <CloneChat />
               </div>
             )}

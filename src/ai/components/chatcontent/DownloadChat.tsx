@@ -10,14 +10,18 @@ import {
   htmlToImg,
 } from '@utils/chat';
 import ImageIcon from '@icon/ImageIcon';
-import PdfIcon from '@icon/PdfIcon';
 import MarkdownIcon from '@icon/MarkdownIcon';
 import JsonIcon from '@icon/JsonIcon';
 
 import downloadFile from '@utils/downloadFile';
+import { Locator } from '@src/common/data/Locator';
+import { AIService } from '@src/ai/mgr/AIService';
 
 const DownloadChat = React.memo(
   ({ saveRef }: { saveRef: React.RefObject<HTMLDivElement> }) => {
+
+    const currentChat = Locator.fetch(AIService).currentAiBot?.currentChat;
+    if (!currentChat) return null;
     const { t } = useTranslation();
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     return (
@@ -46,13 +50,7 @@ const DownloadChat = React.memo(
                     const imgData = await htmlToImg(saveRef.current);
                     downloadImg(
                       imgData,
-                      `${
-                        useStore
-                          .getState()
-                          .chats?.[
-                            useStore.getState().currentChatIndex
-                          ].title.trim() ?? 'download'
-                      }.png`
+                      `download.png`
                     );
                   }
                 }}
@@ -87,20 +85,11 @@ const DownloadChat = React.memo(
                 aria-label='markdown'
                 onClick={async () => {
                   if (saveRef && saveRef.current) {
-                    const chats = useStore.getState().chats;
-                    if (chats) {
-                      const markdown = chatToMarkdown(
-                        chats[useStore.getState().currentChatIndex]
-                      );
+                      const markdown = chatToMarkdown(currentChat);
                       downloadMarkdown(
                         markdown,
-                        `${
-                          chats[
-                            useStore.getState().currentChatIndex
-                          ].title.trim() ?? 'download'
-                        }.md`
+                        `download.md`
                       );
-                    }
                   }
                 }}
               >
@@ -111,11 +100,7 @@ const DownloadChat = React.memo(
                 className='btn btn-neutral gap-2'
                 aria-label='json'
                 onClick={async () => {
-                  const chats = useStore.getState().chats;
-                  if (chats) {
-                    const chat = chats[useStore.getState().currentChatIndex];
-                    downloadFile([chat], chat.title);
-                  }
+                    downloadFile([currentChat], currentChat.title);
                 }}
               >
                 <JsonIcon />

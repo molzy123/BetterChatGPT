@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import './main.css';
@@ -21,6 +21,12 @@ moduleClasses.forEach((moduleClass) => {
   const module = Locator.fetch(moduleClass);
   module.start();
 })
+
+useEffect(() => {
+  const dir = (window as any).api.getDirname();
+  console.log(dir);
+  
+}, [])
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>

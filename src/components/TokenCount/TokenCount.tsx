@@ -4,21 +4,18 @@ import { shallow } from 'zustand/shallow';
 
 import countTokens from '@utils/messageUtils';
 import { modelCost } from '@constants/chat';
+import { Locator } from '@src/common/data/Locator';
+import { AIService } from '@src/ai/mgr/AIService';
 
 const TokenCount = React.memo(() => {
   const [tokenCount, setTokenCount] = useState<number>(0);
   const generating = useStore((state) => state.generating);
-  const messages = useStore(
-    (state) =>
-      state.chats ? state.chats[state.currentChatIndex].messages : [],
-    shallow
-  );
 
-  const model = useStore((state) =>
-    state.chats
-      ? state.chats[state.currentChatIndex].config.model
-      : 'gpt-3.5-turbo'
-  );
+  const currentChat = Locator.fetch(AIService).currentAiBot?.currentChat;
+  if (!currentChat) return null;
+  const messages = currentChat.messages;
+
+  const model = currentChat.bot.config.model;
 
   const cost = useMemo(() => {
     const price =

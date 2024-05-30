@@ -12,11 +12,12 @@ import { AIService } from '@src/ai/mgr/AIService';
 import { AiBot } from '@src/ai/data/AiBot';
 import { PopupService } from '@src/common/Popup/PopupService';
 import { WeakObjectEvent, useBindObjectEvent } from '@src/common/Event/WeakObjectEventService';
+import {  ModelOptions } from '@type/chat';
 
 const CreateAiBotUI = ({aiBot} :{aiBot:AiBot}) => {
   console.log(aiBot);
   useBindObjectEvent(aiBot)
-  const models = [{name:'gpt-3.5-turbo' },{name:"gpt-4"}]
+  const models:{name:ModelOptions}[] = [{name:'gpt-3.5-turbo' },{name:"gpt-4"}]
   const aiService = Locator.fetch(AIService)
   const handleConfirm = async () => {
     aiService.createAiBot(aiBot.toJson())

@@ -1,5 +1,5 @@
 
-import MobileBar from '../../../components/MobileBar';
+
 import StopGeneratingButton from '@components/StopGeneratingButton/StopGeneratingButton';
 import ChatContent from '../chatcontent/ChatContent';
 import { Locator } from '@src/common/data/Locator';
@@ -14,7 +14,6 @@ const Chat = ({currentAiBot}:{currentAiBot:AiBot}) => {
   useBindObjectEvent(currentAiBot)
   return (
     <div className={`flex h-full flex-1 flex-col 'md:pl-0'`}>
-      <MobileBar />
       <main className='relative h-full w-full transition-width flex flex-col overflow-hidden items-stretch flex-1'>
         {currentChat && <ChatContent currentChat={currentChat} />}
         <StopGeneratingButton />

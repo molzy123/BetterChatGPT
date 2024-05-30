@@ -13,7 +13,8 @@
     "preview": "vite preview",
     "electron": "concurrently -k \"BROWSER=none yarn dev\" \"wait-on tcp:5173 && electron .\"",
     "pack": "yarn build && electron-builder --dir",
-    "make": "yarn build && electron-builder"
+    "make": "yarn build && electron-builder",
+    "start": "electron ."
   },
   "build": {
     "appId": "better-chatgpt",
@@ -40,7 +41,13 @@
     "win": {
       "target": "NSIS",
       "icon": "dist/icon-rounded.png"
-    }
+    },
+    "files": [
+      "electron/**/*",
+      "index.html",
+      "preload.js",
+      "dist/**/*"
+    ]
   },
   "dependencies": {
     "@dqbd/tiktoken": "^1.0.2",
@@ -80,7 +87,7 @@
     "@vitejs/plugin-react-swc": "^3.0.0",
     "autoprefixer": "^10.4.13",
     "concurrently": "^8.0.1",
-    "electron": "^23.2.0",
+    "electron": "^23.3.13",
     "electron-builder": "^23.6.0",
     "postcss": "^8.4.21",
     "tailwindcss": "^3.2.7",

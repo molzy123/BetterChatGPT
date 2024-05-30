@@ -11,6 +11,7 @@ import { AiApi } from '../mgr/AiApi';
 import { Locator } from '@src/common/data/Locator';
 import { AIService } from '../mgr/AIService';
 import { AiBot } from './AiBot';
+import { Role } from '@type/chat';
 
 export class AiChat {
   id: string;
@@ -126,7 +127,8 @@ export class AiChat {
     this.updateChat();
   }
 
-  public addMessage(message: AiChatMessage, index?: number) {
+  public addMessage(role:Role, content:string, index?: number) {
+    const message = new AiChatMessage(role, content, this);
     if (index) {
       this.messages.splice(index, 0, message);
     } else {
@@ -162,7 +164,7 @@ export class AiChat {
   }
 
   generateChatOnce(question:string){
-    this.addMessage( new AiChatMessage("user", question,this) );
+    this.addMessage("user", question);
     this.generateChat();
     return this.getLastMessage();
   }
@@ -178,7 +180,7 @@ export class AiChat {
         return message.toJson();
       }),
     };
-    this.addMessage(new AiChatMessage('assistant', '',this));
+    this.addMessage('assistant', '');
     const lastMessage = this.getLastMessage();
     AiApi.generateChat(
       arg,

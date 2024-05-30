@@ -1,4 +1,5 @@
-const path = require('path');
+// const path = require('path');
+const path = require("node:path")
 
 const {
   app,
@@ -10,6 +11,7 @@ const {
   Tray,
   Menu,
   MenuItem,
+  ipcMain,
 } = require('electron');
 const isDev = require('electron-is-dev');
 const { autoUpdater } = require('electron-updater');
@@ -22,7 +24,6 @@ if (require('electron-squirrel-startup')) app.quit();
 const PORT = isDev ? '5173' : '51735';
 const ICON = 'icon-rounded.png';
 const ICON_TEMPLATE = 'iconTemplate.png';
-
 const setupLinksLeftClick = (win) => {
   win.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
@@ -149,6 +150,11 @@ function createWindow() {
     autoHideMenuBar: true,
     show: false,
     icon: assetPath(ICON),
+    webPreferences:{
+      preload: path.join(__dirname, 'preload.cjs'),
+      nodeIntegration: true, // 启用 Node.js 集成
+      contextIsolation: false, // 禁用上下文隔离
+    }
   });
 
   createTray(win);
@@ -232,6 +238,7 @@ if (!instanceLock) {
 
   app.whenReady().then(() => {
     win = createWindow();
+    ipcMain.handle("ping",()=>"pong")
   });
 }
 
@@ -239,8 +246,7 @@ const createServer = () => {
   // Dependencies
   const http = require('http');
   const fs = require('fs');
-  const path = require('path');
-
+  
   // MIME types for different file extensions
   const mimeTypes = {
     '.html': 'text/html',
@@ -257,7 +263,14 @@ const createServer = () => {
 
   // Create a http server
   const server = http.createServer((request, response) => {
-    // Get the file path from the URL
+    __dirname = window.api.getDirname();
+    if(request.method == "GET" && request.url === "/trigger")
+    {
+      ipcMain.emit("show-popup");
+      response.writeHead(200, { 'Content-Type': 'application/json' });
+      response.end(JSON.stringify({ message: "Popup triggered" }));
+    }else{
+      // Get the file path from the URL
     let filePath =
       request.url === '/'
         ? `${path.join(__dirname, '../dist/index.html')}`
@@ -293,6 +306,9 @@ const createServer = () => {
         response.end(content, 'utf-8');
       }
     });
+    }
+
+    
   });
 
   // Listen for request on port ${PORT}

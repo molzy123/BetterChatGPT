@@ -1,10 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import useStore from '@store/store';
-
 import PlusIcon from '@icon/PlusIcon';
-
-import useAddChat from '@hooks/useAddChat';
 import CreateAiBotUI from '@src/ai/ui/CreateAiBotUI';
 import MyBotUI from '@src/ai/ui/MyBotUI';
 import { Locator } from '@src/common/data/Locator';

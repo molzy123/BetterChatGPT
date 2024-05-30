@@ -1,7 +1,6 @@
 import React, { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useStore from '@store/store';
-import useSubmit from '@hooks/useSubmit';
 import PopupModal from '@components/PopupModal';
 import TokenCount from '@components/TokenCount';
 import { AIService } from '@src/ai/mgr/AIService';
@@ -61,7 +60,7 @@ const EditView = ({
   const handleSave = () => {
     if (sticky && (_content === '' || useStore.getState().generating)) return;
     if (sticky) {
-      aiService.currentAiBot?.currentChat?.addMessage(new AiChatMessage(inputRole, _content))
+      aiService.currentAiBot?.currentChat?.addMessage(inputRole,  _content)
       _setContent('');
       resetTextAreaHeight();
     } else {
@@ -70,13 +69,11 @@ const EditView = ({
       message.save()
     }
   };
-
-  const { handleSubmit } = useSubmit();
   const handleGenerate = () => {
     if (useStore.getState().generating) return;
     if (sticky) {
       if (_content !== '') {
-        aiService.currentAiBot?.currentChat?.addMessage(new AiChatMessage( inputRole, _content))
+        aiService.currentAiBot?.currentChat?.addMessage(inputRole, _content)
       }
       _setContent('');
       resetTextAreaHeight();

@@ -14,6 +14,7 @@ import UserLogin from './user/components/UserLogin';
 import Chat from './ai/components/chat/Chat';
 import { AIService } from './ai/mgr/AIService';
 import EnglishWordMain from './english_word/EnglishWordMain';
+import { ipcRenderer } from 'electron';
 function App() {
   const setTheme = useStore((state) => state.setTheme); // 获取设置主题的函数
   const tabs = ['Tab1', 'Tab2', 'Tab3'];
@@ -31,6 +32,10 @@ function App() {
 
   useEffect(() => {
     userToken.current = userService.accessToken;
+    ipcRenderer.on('show-popup', () => {
+      alert('Popup triggered from server!');
+      Locator.fetch(PopupService).showPopupOnce(UserLogin)
+  });
   })
   useBindEventRefresh(EventEnum.CURRENT_BOT_CHANGED)
   const currentAiBot = Locator.fetch(AIService).currentAiBot
@@ -91,6 +96,7 @@ function App() {
           </div>}
         {activeTab === 'Tab2' && <UserInfo/>  }
         {activeTab === 'Tab3' && <EnglishWordMain/> }
+        
       </main>
     </div>
   );

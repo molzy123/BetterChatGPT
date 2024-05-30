@@ -97,12 +97,12 @@ abstract class AbstractRpc implements IRpcRequest {
   }
 }
 
-export class BaseRpcRequest extends AbstractRpc {
-  success: (response: ApiResponse) => void;
+export class BaseRpcRequest<T> extends AbstractRpc {
+  success: (response: T) => void;
 
   constructor(
     path: string,
-    success: (response: ApiResponse) => void,
+    success: (response: T) => void,
     method?: string,
     body?: any,
     header?: Record<string, string>,

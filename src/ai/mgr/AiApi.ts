@@ -1,6 +1,5 @@
 import { handleErrorStatus } from '@utils/api';
 import IAiBotCreateDef, { IAiBotDef, IAiBotUpdateDef, IAiChatDef, IAiChatGenerateDef, IAiChatMessageDef, IAiConfigDef } from '@src/ai/data/AIDef';
-import { getChatCompletion } from '@api/api';
 import { BaseRpcRequest, StreamRpcRequest } from '@src/common/Net/RpcRequest';
 import { Locator } from '@src/common/data/Locator';
 import { UserService } from '@src/user/mgr/UserService';

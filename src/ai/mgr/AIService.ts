@@ -17,7 +17,7 @@ export function useEventValue<T>(value: T):T {
       setSymbol(Symbol());
     };
     if (typeof value == 'object' && value != null) {
-      let unBind = undefined;
+      let unBind:(()=>void)|undefined;
 
       unBind = WeakObjectEvent.bind(value, callback);
 

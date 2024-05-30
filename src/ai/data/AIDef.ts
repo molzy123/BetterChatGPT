@@ -16,7 +16,7 @@ export interface IAiBotUpdateDef {
 }
 
 export interface IAiConfigDef {
-  model: string;
+  model: ModelOptions;
   max_tokens: number;
   temperature: number;
   top_p: number;
@@ -48,7 +48,7 @@ export interface IAiChatMessageDef {
 
 export interface IAiChatDef {
   id:string
-  botId: string;
+  botId: number;
   name: string;
   messages: IAiChatMessageDef[];
   createTime: string;
