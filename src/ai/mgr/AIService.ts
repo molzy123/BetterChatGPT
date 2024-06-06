@@ -62,9 +62,9 @@ export class AIService extends AbstractModule {
 
   private aiBotMap: Map<number, AiBot> = new Map<number, AiBot>();
 
-  initialize(loginData:any): void {
-    if(loginData.bots){
-        this.onGetAiBotListComplete(loginData.bots);
+  initialize(loginData: any): void {
+    if (loginData.bots) {
+      this.onGetAiBotListComplete(loginData.bots);
     }
   }
 
@@ -79,6 +79,22 @@ export class AIService extends AbstractModule {
     AiApi.createAiBot(data, (data: IAiBotDef) => {
       const aiBot = AiBot.fromJson(data);
       this.aiBotList.push(aiBot);
+      this.aiBotMap.set(aiBot.id, aiBot);
+      if (cb) {
+        cb(aiBot);
+      }
+    });
+  }
+
+  public updateAiBot(data: IAiBotDef, cb?: Function) {
+    AiApi.updateAiBot(data, (data: IAiBotDef) => {
+      const aiBot = AiBot.fromJson(data);
+      this.aiBotList = this.aiBotList.map((item) => {
+        if (item.id == aiBot.id) {
+          return aiBot;
+        }
+        return item;
+      });
       this.aiBotMap.set(aiBot.id, aiBot);
       if (cb) {
         cb(aiBot);

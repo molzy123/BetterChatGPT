@@ -1,15 +1,11 @@
-import { handleErrorStatus } from '@utils/api';
 import IAiBotCreateDef, {
   IAiBotDef,
   IAiBotUpdateDef,
   IAiChatDef,
   IAiChatGenerateDef,
   IAiChatMessageDef,
-  IAiConfigDef,
 } from '@src/ai/data/AIDef';
 import { BaseRpcRequest, StreamRpcRequest } from '@src/common/Net/RpcRequest';
-import { Locator } from '@src/common/System/Locator';
-import { UserService } from '@src/user/mgr/UserService';
 
 const baseUrl = 'http://21hut.com:8080/v1';
 
@@ -31,6 +27,14 @@ export const AiApi = {
     success: (response: IAiBotDef) => void
   ) {
     const rpc = new BaseRpcRequest(baseUrl + '/bot', success, 'POST', data);
+    return rpc.send();
+  },
+
+  updateAiBot: function (
+    data: IAiBotUpdateDef,
+    success: (response: IAiBotDef) => void
+  ) {
+    const rpc = new BaseRpcRequest(baseUrl + '/bot', success, 'PUT', data);
     return rpc.send();
   },
   getAiBotList: async function (success: (response: any) => void) {

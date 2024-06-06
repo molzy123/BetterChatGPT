@@ -28,20 +28,11 @@ export const EventService = {
   },
 
   dispatchEvent(eventName: string, ...args: any[]): void {
-    console.log('>>>>>>>>dispatchEvent', eventName, args);
-
     if (!this.eventMap.has(eventName)) {
       return;
     }
-
-    console.log('>>>>>>>>foreach');
-
     const callbacks = this.eventMap.get(eventName);
-    console.log('<<<<<<<callbacks', callbacks);
-
     callbacks?.forEach((callback) => {
-      console.log('>>>>zghxing ');
-
       callback(...args);
     });
   },
