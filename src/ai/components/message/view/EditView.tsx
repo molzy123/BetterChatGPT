@@ -2,9 +2,8 @@ import React, { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useStore from '@store/store';
 import PopupModal from '@components/PopupModal';
-import TokenCount from '@components/TokenCount';
 import { AIService } from '@src/ai/mgr/AIService';
-import { Locator } from '@src/common/data/Locator';
+import { Locator } from '@src/common/System/Locator';
 import { AiChatMessage } from '@src/ai/data/AiChatMessage';
 import CommandPrompt from '../commandprompt/CommandPrompt';
 import { AiApi } from '@src/ai/mgr/AiApi';
@@ -213,7 +212,7 @@ const EditViewButtons = memo(
             </button>
           )}
         </div>
-        {sticky && advancedMode && <TokenCount />}
+        {/* {sticky && advancedMode && <TokenCount />} */}
         <CommandPrompt _setContent={_setContent} />
       </div>
     );

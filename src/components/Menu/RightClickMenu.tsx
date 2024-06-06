@@ -1,5 +1,5 @@
 import { ContextMenuService } from '@src/common/ContextMenu/ContextMenuService';
-import { Locator } from '@src/common/data/Locator';
+import { Locator } from '@src/common/System/Locator';
 import React from 'react';
 
 

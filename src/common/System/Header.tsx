@@ -1,11 +1,10 @@
 import { UserService } from "@src/user/mgr/UserService";
 import { useEffect, useRef, useState } from "react";
-import { Locator } from "../data/Locator";
-import { useBindEvent, useBindEventRefresh } from "../Event/EventService";
+import { Locator } from "./Locator";
+import { useBindEventRefresh } from "../Event/EventService";
 import { EventEnum } from "../Event/EventEnum";
-import { PopupService } from "../Popup/PopupService";
-import UserLogin from "@src/user/components/UserLogin";
 import Dropdown, { OptionItem } from "../components/Drapdown";
+import { useBindObjectEvent } from "../Event/WeakObjectEventService";
 
 
 export interface TabItemData {
@@ -17,6 +16,8 @@ function Header({ tabChange }: { tabChange: (arg0: TabItemData) => void }) {
     const tabs: Array<TabItemData> = [{ index: 1, name: "Chat" }, { index: 2, name: "Info" }, { index: 3, name: "Word" }];
     const [activeTab, setActiveTab] = useState(tabs[0]);
     const userService = Locator.fetch(UserService)
+    useBindObjectEvent(userService.user)
+    useBindEventRefresh(EventEnum.APP_STATE_CHANGE)
     const [isDrawerOpen, setIsDrawerOpen] = useState(false)
     const parentRef = useRef<HTMLDivElement>(null); // 以 div 为例，根据实际情况选择元素类型
 
@@ -29,9 +30,6 @@ function Header({ tabChange }: { tabChange: (arg0: TabItemData) => void }) {
         }
         setIsDrawerOpen(false);
     }
-
-
-    useBindEventRefresh(EventEnum.LOGIN_STATE_CHANGE)
     const handleTabClick = ({ tab }: { tab: any }) => {
         setActiveTab(tab);
         tabChange(tab)
@@ -58,7 +56,7 @@ function Header({ tabChange }: { tabChange: (arg0: TabItemData) => void }) {
             }}>
                 <div className="h-full">
                     <img className='w-8 h-8 rounded-full' src='https://images.unsplash.com/photo-1470429346530-f5590bff80d2?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=7200' alt='User avatar' />
-                    <span>linzy</span>
+                    <span>{userService.user?.username}</span>
                 </div>
                 <div className="h-0 w-0" ref={parentRef}>
                     {isDrawerOpen && <Dropdown options={options} optionClick={handOptionClick} hideDropdown={() => setIsDrawerOpen(false)} />}

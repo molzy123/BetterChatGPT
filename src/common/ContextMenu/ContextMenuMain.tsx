@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { DynamicComponentState, PopupService } from '@src/common/Popup/PopupService';
-import { Locator } from '@src/common/data/Locator';
+import { Locator } from '@src/common/System/Locator';
 import { EventService } from '@src/common/Event/EventService';
 import { EventEnum } from '@src/common/Event/EventEnum';
 

@@ -14,7 +14,7 @@ import MarkdownIcon from '@icon/MarkdownIcon';
 import JsonIcon from '@icon/JsonIcon';
 
 import downloadFile from '@utils/downloadFile';
-import { Locator } from '@src/common/data/Locator';
+import { Locator } from '@src/common/System/Locator';
 import { AIService } from '@src/ai/mgr/AIService';
 
 const DownloadChat = React.memo(

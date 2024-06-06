@@ -2,8 +2,8 @@ import { Role } from '@type/chat';
 import { AiBot } from '@src/ai/data/AiBot';
 import { AiChatMessage } from '@src/ai/data/AiChatMessage';
 import { AIService } from '@src/ai/mgr/AIService';
-import { AbstractModule } from '@src/common/data/AbstractModule'
-import { Locator } from '@src/common/data/Locator'
+import { AbstractModule } from '@src/common/System/AbstractModule'
+import { Locator } from '@src/common/System/Locator'
 import { AiChat } from '@src/ai/data/AIChat';
 import { EventService } from '@src/common/Event/EventService';
 import { EventEnum } from '@src/common/Event/EventEnum';
@@ -17,11 +17,12 @@ export class EnglishWordService extends AbstractModule {
     
     botMap:Map<EnglishBotEnum,AiBot> = new Map();
     initialize(): void {
-        // 从服务器获取需要的机器Bot，初始botMap
-        EventService.registerEvent(EventEnum.BOT_INIT_COMPLETE,(botList:AiBot[])=>{
-            const bot = Locator.fetch(AIService).getArticleBot()
-            if(bot)this.botMap.set(EnglishBotEnum.ARTICLE,bot);
-        });
+    }
+
+    // 依赖于其他模块的初始化
+    start(): void {
+        const bot = Locator.fetch(AIService).getArticleBot()
+        if(bot)this.botMap.set(EnglishBotEnum.ARTICLE,bot);
     }
 
     // 每次调用这个函数，都会生成一个新的对话

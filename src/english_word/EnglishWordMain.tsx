@@ -4,7 +4,7 @@ import { NewWordEntity } from './mgr/WordApi';
 import Article from './components/Article';
 import { content } from 'html2canvas/dist/types/css/property-descriptors/content';
 import { AiChatMessage } from '@src/ai/data/AiChatMessage';
-import { Locator } from '@src/common/data/Locator';
+import { Locator } from '@src/common/System/Locator';
 import { EnglishWordService } from './mgr/EnglishWordService';
 import { EventService } from '@src/common/Event/EventService';
 import { EventEnum } from '@src/common/Event/EventEnum';

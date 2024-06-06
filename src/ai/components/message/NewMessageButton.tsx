@@ -1,6 +1,6 @@
 import React from 'react';
 import PlusIcon from '@icon/PlusIcon';
-import { Locator } from '@src/common/data/Locator';
+import { Locator } from '@src/common/System/Locator';
 import { AIService } from '@src/ai/mgr/AIService';
 import { AiChatMessage } from '@src/ai/data/AiChatMessage';
 

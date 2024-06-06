@@ -1,7 +1,3 @@
-import { IModule } from '@src/common/data/Modules';
-import { AbstractModule } from './AbstractModule';
-
-
 export const StorageService = {
 
   setItem(key:string, value:any):void{

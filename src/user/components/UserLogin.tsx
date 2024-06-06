@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import useStore from '@store/store';
 import ReactDOM from 'react-dom';
-import { Locator } from '@src/common/data/Locator';
+import { Locator } from '@src/common/System/Locator';
 import { UserService } from '@src/user/mgr/UserService';
 import { PopupService } from '@src/common/Popup/PopupService';
 

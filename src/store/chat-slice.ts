@@ -1,6 +1,6 @@
+import { FolderCollection } from '@type/chat';
 import { StoreSlice } from './store';
-import { ChatInterface, FolderCollection, MessageInterface } from '@type/chat';
-import { IAiBotDef, IAiChatDef } from '@src/ai/data/AIDef';
+
 
 
 export interface ChatSlice {

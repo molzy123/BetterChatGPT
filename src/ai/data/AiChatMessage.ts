@@ -1,4 +1,4 @@
-import { Locator } from '@src/common/data/Locator';
+import { Locator } from '@src/common/System/Locator';
 import { Role } from '../../../../BetterChatGPT/src/types/chat';
 import { IAiChatMessageDef } from './AIDef';
 import { AIService } from '../mgr/AIService';

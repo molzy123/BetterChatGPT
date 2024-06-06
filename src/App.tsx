@@ -5,7 +5,7 @@ import Menu from '@components/Menu'; // 导入菜单组件
 import { ChatInterface } from '@type/chat'; // 导入聊天接口类型
 import { Theme } from '@type/theme'; // 导入主题类型
 import UserInfo from '@src/user/components/UserInfo';
-import { Locator } from './common/data/Locator';
+import { Locator } from './common/System/Locator';
 import { UserService } from './user/mgr/UserService';
 import { EventEnum } from './common/Event/EventEnum';
 import { useBindEventRefresh } from './common/Event/EventService';
@@ -13,9 +13,6 @@ import Chat from './ai/components/chat/Chat';
 import { AIService } from './ai/mgr/AIService';
 import EnglishWordMain from './english_word/EnglishWordMain';
 import Header, { TabItemData } from './common/System/Header';
-import { BrowserRouter, Route, Routes, useNavigate } from 'react-router-dom';
-import TextShowWin from './window/TextShowWin';
-import UserLogin from './user/components/UserLogin';
 
 function App() {
   const setTheme = useStore((state) => state.setTheme); // 获取设置主题的函数
@@ -23,13 +20,8 @@ function App() {
 
   const [curTab, setCurTab] = useState<TabItemData>();
   useBindEventRefresh(EventEnum.CURRENT_BOT_CHANGED)
-  console.log(">>>>>>>>>>>>APP refresh");
-
-  useBindEventRefresh(EventEnum.LOGIN_STATE_CHANGE)
+  useBindEventRefresh(EventEnum.APP_STATE_CHANGE)
   const currentAiBot = Locator.fetch(AIService).currentAiBot
-  console.log(">>>>>>>APP", currentAiBot);
-  console.log(">>>>>>>APP", curTab);
-  const userService = Locator.fetch(UserService)
 
   useEffect(() => {
     const theme = localStorage.getItem('theme');

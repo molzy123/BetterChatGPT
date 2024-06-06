@@ -1,13 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import PopupModal from '@components/PopupModal';
-import IAiBotCreateDef, { IAiBotDef } from '@src/ai/data/AIDef';
 
 import { CommonTextInput } from '@src/common/components/CommonTextInput';
-import { sum } from 'lodash';
 import CommonSelector from '@src/common/components/CommonSelector';
 import CommonSlider from '@src/common/components/CommonSlider';
-import useStore from '@store/store';
-import { Locator } from '@src/common/data/Locator';
+import { Locator } from '@src/common/System/Locator';
 import { AIService } from '@src/ai/mgr/AIService';
 import { AiBot } from '@src/ai/data/AiBot';
 import { PopupService } from '@src/common/Popup/PopupService';
@@ -17,7 +14,7 @@ import {  ModelOptions } from '@type/chat';
 const CreateAiBotUI = ({aiBot} :{aiBot:AiBot}) => {
   console.log(aiBot);
   useBindObjectEvent(aiBot)
-  const models:{name:ModelOptions}[] = [{name:'gpt-3.5-turbo' },{name:"gpt-4"}]
+  const models:{name:ModelOptions}[] = [{name:'gpt-3.5-turbo' },{name:"gpt-4"},{name:"gpt-4o"}]
   const aiService = Locator.fetch(AIService)
   const handleConfirm = async () => {
     aiService.createAiBot(aiBot.toJson())

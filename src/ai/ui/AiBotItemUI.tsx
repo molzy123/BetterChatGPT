@@ -3,7 +3,7 @@ import { IAiBotDef } from '@src/ai/data/AIDef';
 import useStore from '@store/store';
 import { get } from '@src/common/utils/CommonRequest';
 import { AiBot } from '@src/ai/data/AiBot';
-import { Locator } from '@src/common/data/Locator';
+import { Locator } from '@src/common/System/Locator';
 import { AIService } from '@src/ai/mgr/AIService';
 import { EventService } from '@src/common/Event/EventService';
 import { PopupService } from '@src/common/Popup/PopupService';

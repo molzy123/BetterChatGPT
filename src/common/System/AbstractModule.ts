@@ -1,15 +1,16 @@
 import { EventEnum } from "../Event/EventEnum";
 import { EventService } from "../Event/EventService";
-import { Locator } from "./Locator";
-import { IModule } from "./Modules";
+import { IModule, ISystemModule } from "./IModule";
 
 export abstract class AbstractModule implements IModule{
 
     private _eventCbList = new Set<Function>();
 
-    initialize(): void {
+    initialize(loginData:any): void {
         
     }
+
+
     start(): void {
 
     }
@@ -29,4 +30,10 @@ export abstract class AbstractModule implements IModule{
     }
 
 
+}
+
+export abstract class AbstractSystemModule extends AbstractModule implements ISystemModule{
+    initialize(): void {
+        
+    }
 }

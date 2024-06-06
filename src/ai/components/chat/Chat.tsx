@@ -2,7 +2,7 @@
 
 import StopGeneratingButton from '@components/StopGeneratingButton/StopGeneratingButton';
 import ChatContent from '../chatcontent/ChatContent';
-import { Locator } from '@src/common/data/Locator';
+import { Locator } from '@src/common/System/Locator';
 import { AIService } from '@src/ai/mgr/AIService';
 import { useBindEventRefresh } from '@src/common/Event/EventService';
 import { EventEnum } from '@src/common/Event/EventEnum';

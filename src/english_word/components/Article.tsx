@@ -6,7 +6,7 @@ import { AiChatMessage } from '@src/ai/data/AiChatMessage';
 import { ContextMenuService } from '@src/common/ContextMenu/ContextMenuService';
 import { useBindObjectEvent } from '@src/common/Event/WeakObjectEventService';
 import { CommonTextInput } from '@src/common/components/CommonTextInput';
-import { Locator } from '@src/common/data/Locator';
+import { Locator } from '@src/common/System/Locator';
 import useStore from '@store/store';
 import React, { MouseEventHandler, useCallback, useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';

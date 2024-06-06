@@ -1,9 +1,8 @@
-import { IModule } from '@src/common/data/Modules';
 import { FunctionComponent } from 'react';
-import { Locator } from '@src/common/data/Locator';
 import { EventService } from '@src/common/Event/EventService';
 import { EventEnum } from '@src/common/Event/EventEnum';
-import { AbstractModule } from '../data/AbstractModule';
+import { AbstractSystemModule } from '../System/AbstractModule';
+
 
 export type DynamicComponentProps = any;
 
@@ -12,28 +11,23 @@ export interface DynamicComponentState {
   props: DynamicComponentProps | null;
 }
 
-export class PopupService {
+export class PopupService extends AbstractSystemModule {
   popupList: DynamicComponentState[] = [];
   popupSet: Set<FunctionComponent> = new Set();
 
   public showPopup(component: any, props?: DynamicComponentProps): number {
-    console.log(component);
-
     props = props || {};
     const popup = { Component: component, props: props };
     this.popupList.push(popup);
-    console.log('Dispatch');
 
     EventService.dispatchEvent(EventEnum.POPUP_CHANGE, this.popupList);
     return this.popupList.length;
   }
 
   public showPopupOnce(component: any, props?: DynamicComponentProps) {
-    console.log('>>>>>showPOponce');
     if (this.popupSet.has(component)) {
       return;
     }
-    console.log('<<<<');
 
     this.showPopup(component, props);
     this.popupSet.add(component);

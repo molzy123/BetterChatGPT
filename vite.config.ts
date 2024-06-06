@@ -5,6 +5,7 @@ import topLevelAwait from 'vite-plugin-top-level-await';
 import electron from 'vite-plugin-electron'
 import renderer from 'vite-plugin-electron-renderer'
 import { resolve } from 'path';
+import FullReload from 'vite-plugin-full-reload';
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react(), wasm(), topLevelAwait(),
@@ -19,6 +20,7 @@ export default defineConfig({
         // Add other built-in modules if necessary
       },
     }),
+    FullReload(['src/**/*']) // 监视 src 目录下所有文件的变化，并进行完整页面刷新。
   ],
   resolve: {
     alias: {
@@ -34,4 +36,10 @@ export default defineConfig({
     },
   },
   base: './',
+  server:{
+    hmr: false,
+    watch :{
+      usePolling: true,
+    }
+  }
 });

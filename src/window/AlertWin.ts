@@ -1,8 +1,8 @@
-const { ipcRenderer } = window.require('electron');
+// const { ipcRenderer } = window.require('electron');
 
 export const AlertWin = {
   send(body: any) {
-    ipcRenderer.send('AlertWin', body);
+    // ipcRenderer.send('AlertWin', body);
   },
 
   sendAction(act: String, arg?: any) {

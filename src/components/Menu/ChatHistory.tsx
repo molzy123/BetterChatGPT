@@ -9,7 +9,7 @@ import EditIcon from '@icon/EditIcon';
 import TickIcon from '@icon/TickIcon';
 import useStore from '@store/store';
 import { AiChat } from '@src/ai/data/AIChat';
-import { Locator } from '@src/common/data/Locator';
+import { Locator } from '@src/common/System/Locator';
 import { AIService } from '@src/ai/mgr/AIService';
 import { useBindEventRefresh } from '@src/common/Event/EventService';
 import { EventEnum } from '@src/common/Event/EventEnum';
@@ -18,7 +18,7 @@ import { AiBot } from '@src/ai/data/AiBot';
 import RightClickMenu, { MenuItemData, RightClickMenuProps } from './RightClickMenu';
 import { ContextMenuService } from '@src/common/ContextMenu/ContextMenuService';
 import { MenuItem } from 'electron';
-import StarIcon from '@icon/StarIcon';
+import StarIcon, { TemplateIcon } from '@icon/StarIcon';
 
 const ChatHistoryClass = {
   normal:
@@ -103,7 +103,7 @@ const ChatHistory = React.memo(
         }}
         onContextMenu={handleRightClick}
       >
-        <ChatIcon />
+        { chat.isTemplate ? <TemplateIcon/> : <ChatIcon /> } 
         <div className=' flex-1 text-ellipsis max-h-5 overflow-hidden break-all relative' title={chat.title}>
           {isEdit ? (
             <input
@@ -164,9 +164,6 @@ const ChatHistory = React.memo(
                   aria-label='delete chat'
                 >
                   <DeleteIcon />
-                </button>
-                <button className='p-1 hover:text-white'>
-                { chat.isTemplate &&  <StarIcon />}
                 </button>
               </>
             )}

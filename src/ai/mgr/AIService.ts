@@ -3,12 +3,10 @@ import { AiBot } from '@src/ai/data/AiBot';
 import { AiApi } from '@src/ai/mgr/AiApi';
 import { IAiBotCreateDef, IAiBotDef } from '@src/ai/data/AIDef';
 import { EventService } from '@src/common/Event/EventService';
-import { Locator } from '@src/common/data/Locator';
 import { EventEnum } from '@src/common/Event/EventEnum';
 import { useEffect, useState } from 'react';
-import { AbstractModule } from '@src/common/data/AbstractModule';
+import { AbstractModule } from '@src/common/System/AbstractModule';
 import { WeakObjectEvent } from '@src/common/Event/WeakObjectEventService';
-import { UserService } from '@src/user/mgr/UserService';
 
 export function useEventValue<T>(value: T): T {
   const [_, setSymbol] = useState<Symbol>();
@@ -35,8 +33,6 @@ export function useEventValue<T>(value: T): T {
 export class AIService extends AbstractModule {
   private _currentAiBot: AiBot | undefined = undefined;
   set currentAiBot(value: AiBot | undefined) {
-    console.log('>>>>>>value bot', value);
-
     if (value == undefined || value == this._currentAiBot) {
       return;
     }
@@ -66,11 +62,17 @@ export class AIService extends AbstractModule {
 
   private aiBotMap: Map<number, AiBot> = new Map<number, AiBot>();
 
-  initialize(): void {
-    const bots = Locator.fetch(UserService).user?.bots;
-    if (bots) {
-      this.onGetAiBotListComplete(bots);
+  initialize(loginData:any): void {
+    if(loginData.bots){
+        this.onGetAiBotListComplete(loginData.bots);
     }
+  }
+
+  destroy(): void {
+    super.destroy();
+    this.aiBotMap.clear();
+    this.aiBotList = [];
+    this._currentAiBot = undefined;
   }
 
   public createAiBot(data: IAiBotCreateDef, cb?: Function) {
@@ -91,7 +93,6 @@ export class AIService extends AbstractModule {
       return aiBot;
     });
     this.currentAiBot = this.aiBotList[this.aiBotList.length - 1];
-    EventService.dispatchEvent(EventEnum.BOT_INIT_COMPLETE, this.aiBotList);
   };
 
   public getBotById(id: number) {

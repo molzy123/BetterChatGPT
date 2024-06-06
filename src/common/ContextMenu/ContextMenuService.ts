@@ -1,6 +1,6 @@
 import { EventService } from '@src/common/Event/EventService';
 import { EventEnum } from '@src/common/Event/EventEnum';
-import { AbstractModule } from '../data/AbstractModule';
+import { AbstractModule } from '../System/AbstractModule';
 import { DynamicComponentProps, DynamicComponentState } from '../Popup/PopupService';
 
 

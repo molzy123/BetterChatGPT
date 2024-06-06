@@ -8,7 +8,7 @@ import IAiBotCreateDef, {
   IAiConfigDef,
 } from '@src/ai/data/AIDef';
 import { BaseRpcRequest, StreamRpcRequest } from '@src/common/Net/RpcRequest';
-import { Locator } from '@src/common/data/Locator';
+import { Locator } from '@src/common/System/Locator';
 import { UserService } from '@src/user/mgr/UserService';
 
 const baseUrl = 'http://21hut.com:8080/v1';

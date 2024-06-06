@@ -4,7 +4,7 @@ import useStore from '@store/store';
 import PlusIcon from '@icon/PlusIcon';
 import CreateAiBotUI from '@src/ai/ui/CreateAiBotUI';
 import MyBotUI from '@src/ai/ui/MyBotUI';
-import { Locator } from '@src/common/data/Locator';
+import { Locator } from '@src/common/System/Locator';
 import { PopupService } from '@src/common/Popup/PopupService';
 import { AIService } from '@src/ai/mgr/AIService';
 import { AiBot } from '@src/ai/data/AiBot';
@@ -51,11 +51,6 @@ const NewChat = ({ folder }: { folder?: string }) =>
         Locator.fetch(PopupService).showPopup(MyBotUI)
       }} className={'p-2 mb-2 cursor-pointer opacity-100 border hover:bg-gray-500/10 border-white/20 rounded-md items-center text-gray-100'}>
         Bot List
-      </a>
-
-      <a onClick={() =>{Locator.fetch(PopupService).showPopupOnce(CreateAiBotUI,{ aiBot:new AiBot()});}} 
-      className={'p-2 mb-2 cursor-pointer opacity-100 border hover:bg-gray-500/10 border-white/20 rounded-md items-center text-gray-100'}>
-        New Bot
       </a>
     </div>
 

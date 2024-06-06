@@ -1,4 +1,4 @@
-import { Locator } from '@src/common/data/Locator';
+import { Locator } from '@src/common/System/Locator';
 import { UserService } from '@src/user/mgr/UserService';
 import useStore from '@store/store';
 import { isNumber } from 'lodash';

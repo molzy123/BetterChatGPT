@@ -1,25 +1,35 @@
-import { UserApi } from '@src/user/mgr/UserApi';
-import { StorageService } from '@src/common/data/StorageService';
-import { User } from '@src/user/data/User';
-import { AbstractModule } from '@src/common/data/AbstractModule';
-import { changeState } from '@src/main';
-import { AppStateEnum } from '@src/common/data/Modules';
-import { Locator } from '@src/common/data/Locator';
-import { AIService } from '@src/ai/mgr/AIService';
-import { UserAllDef } from '../data/UserDef';
 
-export class UserService {
+import { UserApi } from '@src/user/mgr/UserApi';
+import { StorageService } from '@src/common/System/StorageService';
+import { User } from '@src/user/data/User';
+import { AbstractSystemModule } from '@src/common/System/AbstractModule';
+import { changeState } from '@src/main';
+import { UserAllDef } from '../data/UserDef';
+import { AppStateEnum } from '@src/common/System/AppStateEnum';
+import { StorageEnum } from '@src/common/System/StorageEnum';
+
+export class UserService extends AbstractSystemModule {
+  
   private _accessToken: string = '';
   get accessToken(): string {
     return this._accessToken;
   }
   private set accessToken(value: string) {
-    StorageService.setItem('accessToken', value);
+    StorageService.setItem(StorageEnum.accessToken, value);
     this._accessToken = value;
   }
 
   public user?: User;
 
+
+  public initialize(): void {
+    this.accessToken = StorageService.getItem(StorageEnum.accessToken) || '';
+    if (this.accessToken !== '') {
+      this._getLoginData();
+    }
+  }
+
+  
   public login(username: string, password: string, cb?: Function): void {
     const success = (response: any) => {
       if (cb !== undefined) {
@@ -34,7 +44,7 @@ export class UserService {
   private _getLoginData(): void {
     const success = async (data: UserAllDef) => {
       this.user = User.fromJson(data);
-      changeState(AppStateEnum.LOGIN);
+      changeState(AppStateEnum.PLAY);
     };
     UserApi.getUser(success);
   }
@@ -42,7 +52,7 @@ export class UserService {
   public logout(): void {
     this.accessToken = '';
     this.user = undefined;
-    changeState(AppStateEnum.LOGOUT);
+    changeState(AppStateEnum.LOGIN);
   }
 
   public register(

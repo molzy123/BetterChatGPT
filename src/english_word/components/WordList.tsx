@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { WordItem } from './WordItem';
 import { NewWordEntity } from '../mgr/WordApi';
-import { Locator } from '@src/common/data/Locator';
+import { Locator } from '@src/common/System/Locator';
 import { EnglishWordService } from '../mgr/EnglishWordService';
 
 

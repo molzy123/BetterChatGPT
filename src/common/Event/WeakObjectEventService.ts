@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Locator } from '../data/Locator';
+import { Locator } from '../System/Locator';
 import { AIService } from '@src/ai/mgr/AIService';
 
 export const WeakObjectEvent = {

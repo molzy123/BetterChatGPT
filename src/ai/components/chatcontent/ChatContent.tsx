@@ -10,15 +10,23 @@ import { AiChatMessage } from '@src/ai/data/AiChatMessage';
 import Message from '../message/Message';
 import { AiChat } from '@src/ai/data/AIChat';
 import { useBindObjectEvent } from '@src/common/Event/WeakObjectEventService';
+import { useBindEvent } from '@src/common/Event/EventService';
+import { EventEnum } from '@src/common/Event/EventEnum';
 
 const ChatContent = ({currentChat} :{currentChat:AiChat}) => {
   useBindObjectEvent(currentChat)
   const inputRole = useStore((state) => state.inputRole);
-  const setError = useStore((state) => state.setError);
   const messages= currentChat.messages
   const advancedMode = useStore((state) => state.advancedMode);
   const generating = useStore.getState().generating;
   const saveRef = useRef<HTMLDivElement>(null);
+  const [error, setError] = useState('');
+  const [showError, setShowError] = useState(false);
+
+  useBindEvent(EventEnum.ERROR, (error: string) => {
+    setError(error);
+    setShowError(true);
+  })
   useEffect(() => {
     if (generating) {
       setError('');
@@ -50,15 +58,15 @@ const ChatContent = ({currentChat} :{currentChat:AiChat}) => {
           </div>
           {/* 用户输入框 */}
           <Message message={new AiChatMessage(inputRole,"",currentChat, "")} index={-1} sticky />
-          {(
+          {showError && (
             <div className='relative py-2 px-3 w-3/5 mt-3 max-md:w-11/12 border rounded-md border-red-500 bg-red-500/10'>
               <div className='text-gray-600 dark:text-gray-100 text-sm whitespace-pre-wrap'>
-                
+                {error}
               </div>
               <div
                 className='text-white absolute top-1 right-1 cursor-pointer'
                 onClick={() => {
-                  setError('');
+                  setShowError(false)
                 }}
               >
                 <CrossIcon />

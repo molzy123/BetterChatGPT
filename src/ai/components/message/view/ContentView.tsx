@@ -24,7 +24,7 @@ import MarkdownModeButton from '../button/MarkdownModeButton';
 
 import CodeBlock from '../CodeBlock';
 import { AiChatMessage } from '@src/ai/data/AiChatMessage';
-import { Locator } from '@src/common/data/Locator';
+import { Locator } from '@src/common/System/Locator';
 import { AIService } from '@src/ai/mgr/AIService';
 import RefreshButton from '../button/RefreshButton';
 import { useBindObjectEvent } from '@src/common/Event/WeakObjectEventService';

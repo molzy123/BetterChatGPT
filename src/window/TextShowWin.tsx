@@ -2,7 +2,7 @@ import StarIcon from "@icon/StarIcon";
 import { AiChatMessage } from "@src/ai/data/AiChatMessage";
 import { AIService } from "@src/ai/mgr/AIService";
 import { useBindObjectEvent } from "@src/common/Event/WeakObjectEventService";
-import { Locator } from "@src/common/data/Locator";
+import { Locator } from "@src/common/System/Locator";
 import { useEffect, useState } from "react";
 import TextContent from "./TextContent";
 import CopyIcon from "@icon/CopyIcon";

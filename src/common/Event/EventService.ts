@@ -68,8 +68,3 @@ export function useBindEventRefresh(event: EventEnum) {
     };
   }, []);
 }
-
-const { ipcRenderer } = window.require('electron');
-ipcRenderer.on('AI', (event, data) => {
-  console.log('EventService', data);
-});

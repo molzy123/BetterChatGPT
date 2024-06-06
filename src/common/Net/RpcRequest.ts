@@ -1,7 +1,7 @@
-import { IModule } from '@src/common/data/Modules';
+import { IModule } from '@src/common/System/Modules';
 import { getClientError, handleErrorStatus } from '@utils/api';
 import me from '@components/Menu/MenuOptions/Me';
-import { Locator } from '@src/common/data/Locator';
+import { Locator } from '@src/common/System/Locator';
 import { UserService } from '@src/user/mgr/UserService';
 import { parseChunk } from '@api/helper';
 import { ApiResponse } from '@src/ai/mgr/AiApi';
