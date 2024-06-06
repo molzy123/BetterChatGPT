@@ -9,7 +9,7 @@ import { EventEnum } from '@src/common/Event/EventEnum';
 import { useBindObjectEvent } from '@src/common/Event/WeakObjectEventService';
 import { AiBot } from '@src/ai/data/AiBot';
 
-const Chat = ({currentAiBot}:{currentAiBot:AiBot}) => {
+const Chat = ({ currentAiBot }: { currentAiBot: AiBot }) => {
   const currentChat = Locator.fetch(AIService).currentAiBot?.currentChat;
   useBindObjectEvent(currentAiBot)
   return (

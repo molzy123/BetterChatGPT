@@ -1,5 +1,5 @@
-import require$$0$6 from "node:path";
 import require$$1 from "electron";
+import require$$0$6 from "node:path";
 import require$$0 from "events";
 import require$$0$4 from "crypto";
 import require$$0$1 from "tty";
@@ -15,8 +15,8 @@ import require$$1$4 from "path";
 import require$$1$5 from "child_process";
 import require$$2 from "zlib";
 import require$$3 from "http";
-import require$$4$2 from "node:console";
-import require$$4$1 from "net";
+import require$$4$1 from "node:console";
+import require$$4$2 from "net";
 var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
 var electron$1 = {};
 const electron = require$$1;
@@ -14283,6 +14283,235 @@ async function load(registry, customFetch) {
   }
 }
 load$1.load = load;
+const path$1 = require$$0$6;
+const {
+  app: app$2,
+  shell,
+  clipboard,
+  dialog: dialog$1,
+  download,
+  BrowserWindow,
+  Tray,
+  Menu,
+  MenuItem,
+  ipcMain
+} = require$$1;
+const isDev = electronIsDev;
+const { autoUpdater } = requireMain();
+const { log } = require$$4$1;
+const PORT = isDev ? "5173" : "51735";
+const ICON = "icon-rounded.png";
+const ICON_TEMPLATE = "iconTemplate.png";
+const isMacOS$1 = process.platform === "darwin";
+var WindowFactory$1 = {
+  createServer() {
+    const PORT2 = isDev ? "5174" : "51735";
+    const http = require$$3;
+    const server = http.createServer((request, response) => {
+      if (request.method == "POST" && request.url === "/trigger") {
+        alert.show();
+        alert.focus();
+        let body = "";
+        request.on("data", (chunk) => {
+          body += chunk.toString();
+          alert.webContents.send("storage", { channel: "AI", message: body });
+        });
+        response.writeHead(200, { "Content-Type": "application/json" });
+        response.end(JSON.stringify({ message: "Popup triggered" }));
+      }
+    });
+    log(">>>>PORT", PORT2);
+    server.listen(PORT2, () => {
+      console.log(`Server listening on http://localhost:${PORT2}/`);
+    });
+  },
+  createTray(win2) {
+    const tray = new Tray(this.assetPath(!isMacOS$1 ? ICON : ICON_TEMPLATE));
+    const contextMenu = Menu.buildFromTemplate([
+      {
+        label: "Show",
+        click: () => {
+          win2.maximize();
+          win2.show();
+        }
+      },
+      {
+        label: "Exit",
+        click: () => {
+          app$2.isQuiting = true;
+          app$2.quit();
+        }
+      }
+    ]);
+    tray.on("click", () => {
+      win2.maximize();
+      win2.show();
+    });
+    tray.setToolTip("Better ChatGPT");
+    tray.setContextMenu(contextMenu);
+    return tray;
+  },
+  creteMain() {
+    autoUpdater.checkForUpdatesAndNotify();
+    let win2 = new BrowserWindow({
+      autoHideMenuBar: true,
+      show: false,
+      icon: this.assetPath(ICON),
+      webPreferences: {
+        nodeIntegration: true,
+        // 启用 Node.js 集成
+        contextIsolation: false
+        // 禁用沙箱
+      }
+    });
+    this.createTray(win2);
+    win2.show();
+    log("is dev", isDev);
+    this.createServer();
+    const startUrl = isDev ? `http://localhost:${PORT}/` : `file://${path$1.join(__dirname, "../dist/index.html")}`;
+    win2.loadURL(startUrl);
+    win2.webContents.openDevTools({ mode: "detach" });
+    this.setupLinksLeftClick(win2);
+    this.setupContextMenu(win2);
+    return win2;
+  },
+  assetPath(asset) {
+    return path$1.join(
+      __dirname,
+      isDev ? `../public/${asset}` : `../dist/${asset}`
+    );
+  },
+  setupContextMenu(win2) {
+    win2.webContents.on("context-menu", (_, params) => {
+      const { x, y, linkURL, selectionText } = params;
+      const template = [
+        { role: "undo" },
+        { role: "redo" },
+        { type: "separator" },
+        { role: "cut" },
+        { role: "copy" },
+        { role: "paste" },
+        { role: "pasteAndMatchStyle" },
+        { role: "delete" },
+        { type: "separator" },
+        { role: "selectAll" },
+        { type: "separator" },
+        { role: "toggleDevTools" }
+      ];
+      const spellingMenu = [];
+      if (selectionText && !linkURL) {
+        for (const suggestion of params.dictionarySuggestions) {
+          spellingMenu.push(
+            new MenuItem({
+              label: suggestion,
+              click: () => win2.webContents.replaceMisspelling(suggestion)
+            })
+          );
+        }
+        if (params.misspelledWord) {
+          spellingMenu.push(
+            new MenuItem({
+              label: "Add to dictionary",
+              click: () => win2.webContents.session.addWordToSpellCheckerDictionary(
+                params.misspelledWord
+              )
+            })
+          );
+        }
+        if (spellingMenu.length > 0) {
+          spellingMenu.push({ type: "separator" });
+        }
+        template.push(
+          { type: "separator" },
+          {
+            label: `Search Google for "${selectionText}"`,
+            click: () => {
+              shell.openExternal(
+                `https://www.google.com/search?q=${encodeURIComponent(
+                  selectionText
+                )}`
+              );
+            }
+          },
+          {
+            label: `Search DuckDuckGo for "${selectionText}"`,
+            click: () => {
+              shell.openExternal(
+                `https://duckduckgo.com/?q=${encodeURIComponent(selectionText)}`
+              );
+            }
+          }
+        );
+      }
+      if (linkURL) {
+        template.push(
+          { type: "separator" },
+          {
+            label: "Open Link in Browser",
+            click: () => {
+              shell.openExternal(linkURL);
+            }
+          },
+          {
+            label: "Copy Link Address",
+            click: () => {
+              clipboard.writeText(linkURL);
+            }
+          },
+          {
+            label: "Save Link As...",
+            click: () => {
+              dialog$1.showSaveDialog(
+                win2,
+                { defaultPath: path$1.basename(linkURL) },
+                (filePath) => {
+                  if (filePath) {
+                    download(win2, linkURL, { filename: filePath });
+                  }
+                }
+              );
+            }
+          }
+        );
+      }
+      Menu.buildFromTemplate([...spellingMenu, ...template]).popup({
+        window: win2,
+        x,
+        y
+      });
+    });
+  },
+  setupLinksLeftClick(win2) {
+    win2.webContents.setWindowOpenHandler(({ url }) => {
+      shell.openExternal(url);
+      return { action: "deny" };
+    });
+  },
+  createAlert() {
+    alert = new BrowserWindow({
+      autoHideMenuBar: true,
+      show: false,
+      icon: this.assetPath(ICON),
+      webPreferences: {
+        nodeIntegration: true,
+        // 启用 Node.js 集成
+        contextIsolation: false
+        // 禁用沙箱
+      },
+      height: 300,
+      width: 300,
+      frame: false,
+      transparent: true
+    });
+    alert.loadURL("http://localhost:5173/alert");
+    ipcMain.on("AlertWin", (event, body) => {
+      if (body.action == "pin") {
+        alert.setAlwaysOnTop(body.arg);
+      }
+    });
+    return alert;
+  }
+};
 var srcExports = {};
 var src = {
   get exports() {
@@ -14722,7 +14951,7 @@ function requireNode() {
           break;
         case "PIPE":
         case "TCP":
-          var net = require$$4$1;
+          var net = require$$4$2;
           stream2 = new net.Socket({
             fd: fd2,
             readable: false,
@@ -14760,12 +14989,12 @@ function requireNode() {
     module.exports = requireNode();
   }
 })(src);
-var path$1 = require$$1$4;
+var path = require$$1$4;
 var spawn = require$$1$5.spawn;
 var debug = srcExports("electron-squirrel-startup");
 var app$1 = require$$1.app;
 var run = function(args, done) {
-  var updateExe = path$1.resolve(path$1.dirname(process.execPath), "..", "Update.exe");
+  var updateExe = path.resolve(path.dirname(process.execPath), "..", "Update.exe");
   debug("Spawning `%s` with args `%s`", updateExe, args);
   spawn(updateExe, args, {
     detached: true
@@ -14775,7 +15004,7 @@ var check = function() {
   if (process.platform === "win32") {
     var cmd = process.argv[1];
     debug("processing squirrel command `%s`", cmd);
-    var target = path$1.basename(process.execPath);
+    var target = path.basename(process.execPath);
     if (cmd === "--squirrel-install" || cmd === "--squirrel-updated") {
       run(["--createShortcut=" + target], app$1.quit);
       return true;
@@ -14792,215 +15021,16 @@ var check = function() {
   return false;
 };
 var electronSquirrelStartup = check();
-const path = require$$0$6;
 const {
   app,
-  shell,
-  clipboard,
-  dialog,
-  download,
-  BrowserWindow,
-  Tray,
-  Menu,
-  MenuItem,
-  ipcMain,
-  ipcRenderer
+  dialog
 } = require$$1;
-const isDev = electronIsDev;
-const { autoUpdater } = requireMain();
-const { log } = require$$4$2;
+const WindowFactory = WindowFactory$1;
 let win = null;
-let alert = null;
 const instanceLock = app.requestSingleInstanceLock();
 const isMacOS = process.platform === "darwin";
 if (electronSquirrelStartup)
   app.quit();
-const PORT = isDev ? "5173" : "51735";
-const ICON = "icon-rounded.png";
-const ICON_TEMPLATE = "iconTemplate.png";
-const setupLinksLeftClick = (win2) => {
-  win2.webContents.setWindowOpenHandler(({ url }) => {
-    shell.openExternal(url);
-    return { action: "deny" };
-  });
-};
-const setupContextMenu = (win2) => {
-  win2.webContents.on("context-menu", (_, params) => {
-    const { x, y, linkURL, selectionText } = params;
-    const template = [
-      { role: "undo" },
-      { role: "redo" },
-      { type: "separator" },
-      { role: "cut" },
-      { role: "copy" },
-      { role: "paste" },
-      { role: "pasteAndMatchStyle" },
-      { role: "delete" },
-      { type: "separator" },
-      { role: "selectAll" },
-      { type: "separator" },
-      { role: "toggleDevTools" }
-    ];
-    const spellingMenu = [];
-    if (selectionText && !linkURL) {
-      for (const suggestion of params.dictionarySuggestions) {
-        spellingMenu.push(
-          new MenuItem({
-            label: suggestion,
-            click: () => win2.webContents.replaceMisspelling(suggestion)
-          })
-        );
-      }
-      if (params.misspelledWord) {
-        spellingMenu.push(
-          new MenuItem({
-            label: "Add to dictionary",
-            click: () => win2.webContents.session.addWordToSpellCheckerDictionary(
-              params.misspelledWord
-            )
-          })
-        );
-      }
-      if (spellingMenu.length > 0) {
-        spellingMenu.push({ type: "separator" });
-      }
-      template.push(
-        { type: "separator" },
-        {
-          label: `Search Google for "${selectionText}"`,
-          click: () => {
-            shell.openExternal(
-              `https://www.google.com/search?q=${encodeURIComponent(
-                selectionText
-              )}`
-            );
-          }
-        },
-        {
-          label: `Search DuckDuckGo for "${selectionText}"`,
-          click: () => {
-            shell.openExternal(
-              `https://duckduckgo.com/?q=${encodeURIComponent(selectionText)}`
-            );
-          }
-        }
-      );
-    }
-    if (linkURL) {
-      template.push(
-        { type: "separator" },
-        {
-          label: "Open Link in Browser",
-          click: () => {
-            shell.openExternal(linkURL);
-          }
-        },
-        {
-          label: "Copy Link Address",
-          click: () => {
-            clipboard.writeText(linkURL);
-          }
-        },
-        {
-          label: "Save Link As...",
-          click: () => {
-            dialog.showSaveDialog(
-              win2,
-              { defaultPath: path.basename(linkURL) },
-              (filePath) => {
-                if (filePath) {
-                  download(win2, linkURL, { filename: filePath });
-                }
-              }
-            );
-          }
-        }
-      );
-    }
-    Menu.buildFromTemplate([...spellingMenu, ...template]).popup({
-      window: win2,
-      x,
-      y
-    });
-  });
-};
-function createWindow() {
-  autoUpdater.checkForUpdatesAndNotify();
-  win = new BrowserWindow({
-    autoHideMenuBar: true,
-    show: false,
-    icon: assetPath(ICON),
-    webPreferences: {
-      nodeIntegration: true,
-      // 启用 Node.js 集成
-      contextIsolation: false
-      // 禁用沙箱
-    }
-  });
-  alert = new BrowserWindow({
-    autoHideMenuBar: true,
-    show: false,
-    height: 300,
-    width: 300,
-    icon: assetPath(ICON),
-    frame: false,
-    transparent: true,
-    webPreferences: {
-      nodeIntegration: true,
-      // 启用 Node.js 集成
-      contextIsolation: false
-      // 禁用沙箱
-    }
-  });
-  alert.loadURL("http://localhost:5173/alert");
-  alert.on("focus", () => {
-    alert.setAlwaysOnTop(true);
-  });
-  alert.on("blur", () => {
-  });
-  createTray(win);
-  win.show();
-  log("is dev", isDev);
-  createServer();
-  const startUrl = isDev ? `http://localhost:${PORT}/` : `file://${path.join(__dirname, "../dist/index.html")}`;
-  win.loadURL(startUrl);
-  win.webContents.openDevTools({ mode: "detach" });
-  setupLinksLeftClick(win);
-  setupContextMenu(win);
-  return win;
-}
-const assetPath = (asset) => {
-  return path.join(
-    __dirname,
-    isDev ? `../public/${asset}` : `../dist/${asset}`
-  );
-};
-const createTray = (win2) => {
-  const tray = new Tray(assetPath(!isMacOS ? ICON : ICON_TEMPLATE));
-  const contextMenu = Menu.buildFromTemplate([
-    {
-      label: "Show",
-      click: () => {
-        win2.maximize();
-        win2.show();
-      }
-    },
-    {
-      label: "Exit",
-      click: () => {
-        app.isQuiting = true;
-        app.quit();
-      }
-    }
-  ]);
-  tray.on("click", () => {
-    win2.maximize();
-    win2.show();
-  });
-  tray.setToolTip("Better ChatGPT");
-  tray.setContextMenu(contextMenu);
-  return tray;
-};
 app.on("window-all-closed", () => {
   if (!isMacOS) {
     app.quit();
@@ -15021,36 +15051,10 @@ if (!instanceLock) {
     }
   });
   app.whenReady().then(() => {
-    win = createWindow();
-    ipcMain.on("alert-pin", (event) => {
-      log("alert-pin");
-      alert.setAlwaysOnTop(true);
-    });
+    win = WindowFactory.creteMain();
+    WindowFactory.createAlert();
   });
 }
-const createServer = () => {
-  const PORT2 = isDev ? "5174" : "51735";
-  const http = require$$3;
-  const server = http.createServer((request, response) => {
-    log(">>>>>>>>>>>>>>>>>>>listen");
-    if (request.method == "POST" && request.url === "/trigger") {
-      console.log("Triggering popup");
-      alert.show();
-      alert.focus();
-      let body = "";
-      request.on("data", (chunk) => {
-        body += chunk.toString();
-        alert.webContents.send("storage", { channel: "AI", message: body });
-      });
-      response.writeHead(200, { "Content-Type": "application/json" });
-      response.end(JSON.stringify({ message: "Popup triggered" }));
-    }
-  });
-  log(">>>>PORT", PORT2);
-  server.listen(PORT2, () => {
-    console.log(`Server listening on http://localhost:${PORT2}/`);
-  });
-};
 export {
   electron$1 as default
 };

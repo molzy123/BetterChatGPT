@@ -6,59 +6,31 @@ import { ChatInterface } from '@type/chat'; // 导入聊天接口类型
 import { Theme } from '@type/theme'; // 导入主题类型
 import UserInfo from '@src/user/components/UserInfo';
 import { Locator } from './common/data/Locator';
-import { UserService, UserStateEnum } from './user/mgr/UserService';
+import { UserService } from './user/mgr/UserService';
 import { EventEnum } from './common/Event/EventEnum';
-import { useBindEvent, useBindEventRefresh } from './common/Event/EventService';
-import { PopupService } from './common/Popup/PopupService';
-import UserLogin from './user/components/UserLogin';
+import { useBindEventRefresh } from './common/Event/EventService';
 import Chat from './ai/components/chat/Chat';
 import { AIService } from './ai/mgr/AIService';
 import EnglishWordMain from './english_word/EnglishWordMain';
-const { ipcRenderer } = window.require('electron');
+import Header, { TabItemData } from './common/System/Header';
+import { BrowserRouter, Route, Routes, useNavigate } from 'react-router-dom';
+import TextShowWin from './window/TextShowWin';
+import UserLogin from './user/components/UserLogin';
+
 function App() {
   const setTheme = useStore((state) => state.setTheme); // 获取设置主题的函数
-  const tabs = ['Tab1', 'Tab2', 'Tab3'];
-  const [activeTab, setActiveTab] = useState(tabs[0]);
-  const userService = Locator.fetch(UserService)
-  const [userToken,setUserToken] = useState<String>(userService.accessToken);
-  
-  useBindEvent(EventEnum.LOGIN_STATE_CHANGE,(value:UserStateEnum)=>{
-    if(value == UserStateEnum.LOGOUT){
-      Locator.fetch(PopupService).showPopupOnce(UserLogin)
-    }else if(value == UserStateEnum.LOGIN){
-      Locator.fetch(PopupService).hidePopup()
-    }
-    setUserToken(userService.accessToken);
-  })
 
-  useEffect(() => {
-    console.log('Adding IPC listener for show-popup');
-    ipcRenderer.on("AI", (event,arg) => {
-      console.log('Received show-popup event',arg);
-      // alert('Popup triggered from server!');
-      // Locator.fetch(PopupService).showPopupOnce(UserLogin);
-    });
 
-    // Cleanup listener on component unmount
-    return () => {
-      console.log('Removing IPC listener for show-popup');
-      ipcRenderer.removeAllListeners('show-popup');
-    };
-  }, []); // 空依赖数组，确保只在组件挂载和卸载时运行
+  const [curTab, setCurTab] = useState<TabItemData>();
   useBindEventRefresh(EventEnum.CURRENT_BOT_CHANGED)
-  const currentAiBot = Locator.fetch(AIService).currentAiBot
+  console.log(">>>>>>>>>>>>APP refresh");
 
-  const handleTabClick = ({ tab }: { tab: any }) => {
-    setActiveTab(tab);
-  };
-  useEffect(() => {
-    // 设置文档的语言
-    document.documentElement.lang = i18n.language;
-    // 监听语言变化事件，更新文档的语言
-    i18n.on('languageChanged', (lng) => {
-      document.documentElement.lang = lng;
-    });
-  }, []);
+  useBindEventRefresh(EventEnum.LOGIN_STATE_CHANGE)
+  const currentAiBot = Locator.fetch(AIService).currentAiBot
+  console.log(">>>>>>>APP", currentAiBot);
+  console.log(">>>>>>>APP", curTab);
+  const userService = Locator.fetch(UserService)
+
   useEffect(() => {
     const theme = localStorage.getItem('theme');
     if (theme) {
@@ -68,45 +40,22 @@ function App() {
     }
   }, []);
   return (
-    <div className='flex flex-col h-screen'>
-      <header className='flex items-center justify-between w-full p-2 bg-gray-850 text-white'>
-        <nav className='flex space-x-4'>
-          {tabs.map((tab) => (
-            <button
-              key={tab}
-              className={` p-1 text-md ${ activeTab === tab ? 'text-gray-300' : 'text-gray-500 hover:text-gray-300'}`}
-              onClick={() => handleTabClick({ tab: tab })}
-            >
-              {tab}
-            </button>
-          ))}
-        </nav>
-        <div className='flex items-center space-x-2 cursor-pointer' onClick={()=>{
-          if(userService.state == UserStateEnum.LOGOUT)
-            {
-              Locator.fetch(PopupService).showPopupOnce(UserLogin)
-            }else
-            {
-              console.log("token:",userToken)
-            }
-        }}>
-          <img className='w-8 h-8 rounded-full' src='https://images.unsplash.com/photo-1470429346530-f5590bff80d2?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=7200' alt='User avatar' />
-          <span>linzy</span>
-        </div>
-      </header>
-      <main className='flex-grow bg-gray-100  overflow-auto'>
-        {activeTab === 'Tab1' &&
-          <div className='flex h-full'>
-            <Menu />
-            <div className='w-full bg-gray-100 overflow-auto'>
-              { currentAiBot && <Chat currentAiBot={currentAiBot} />}
-            </div>
-          </div>}
-        {activeTab === 'Tab2' && <UserInfo/>  }
-        {activeTab === 'Tab3' && <EnglishWordMain/> }
-        
-      </main>
-    </div>
+    <>
+      <div className='flex flex-col h-screen'>
+        <Header tabChange={setCurTab} />
+        <main className='flex-grow bg-gray-100  overflow-auto'>
+          {curTab?.index === 1 &&
+            <div className='flex h-full'>
+              <Menu />
+              <div className='w-full bg-gray-100 overflow-auto'>
+                {currentAiBot && <Chat currentAiBot={currentAiBot} />}
+              </div>
+            </div>}
+          {curTab?.index === 2 && <UserInfo />}
+          {curTab?.index === 3 && <EnglishWordMain />}
+        </main>
+      </div>
+    </>
   );
 }
 

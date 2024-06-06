@@ -6,10 +6,11 @@ import { EventEnum } from '@src/common/Event/EventEnum';
 
 const PopupMain: React.FC = () => {
   const [popupList, setPopupList] = useState<DynamicComponentState[]>([]);
+  console.log(">>>>>>>加載了");
 
   useEffect(() => {
     const callback = (newPopupList: DynamicComponentState[]) => {
-      console.log(newPopupList.length);
+      console.log(">>>>>showpop", newPopupList.length);
       // 确保这里传递的是一个新的数组，以触发状态更新
       setPopupList([...newPopupList]);
     };

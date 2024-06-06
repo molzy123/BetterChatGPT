@@ -7,37 +7,36 @@ import { Locator } from '@src/common/data/Locator';
 import { EventEnum } from '@src/common/Event/EventEnum';
 import { useEffect, useState } from 'react';
 import { AbstractModule } from '@src/common/data/AbstractModule';
-import { UserService, UserStateEnum } from '@src/user/mgr/UserService';
 import { WeakObjectEvent } from '@src/common/Event/WeakObjectEventService';
+import { UserService } from '@src/user/mgr/UserService';
 
-export function useEventValue<T>(value: T):T {
+export function useEventValue<T>(value: T): T {
   const [_, setSymbol] = useState<Symbol>();
   useEffect(() => {
     const callback = () => {
       setSymbol(Symbol());
     };
     if (typeof value == 'object' && value != null) {
-      let unBind:(()=>void)|undefined;
+      let unBind: (() => void) | undefined;
 
       unBind = WeakObjectEvent.bind(value, callback);
 
       return () => {
         unBind ? unBind() : undefined;
       };
-    }else{
-      console.log("bindObject failed",value);
+    } else {
+      console.log('bindObject failed', value);
     }
   }, []);
 
   return value;
 }
 
-
-
 export class AIService extends AbstractModule {
-  
   private _currentAiBot: AiBot | undefined = undefined;
   set currentAiBot(value: AiBot | undefined) {
+    console.log('>>>>>>value bot', value);
+
     if (value == undefined || value == this._currentAiBot) {
       return;
     }
@@ -48,7 +47,10 @@ export class AIService extends AbstractModule {
 
     this._currentAiBot = value;
     value.isSelect = true;
-    EventService.dispatchEvent(EventEnum.CURRENT_BOT_CHANGED, this._currentAiBot);
+    EventService.dispatchEvent(
+      EventEnum.CURRENT_BOT_CHANGED,
+      this._currentAiBot
+    );
   }
   get currentAiBot() {
     return this._currentAiBot;
@@ -56,7 +58,6 @@ export class AIService extends AbstractModule {
 
   public _aiBotList: AiBot[] = [];
   set aiBotList(value: AiBot[]) {
-    console.trace(">>>")
     this._aiBotList = value;
   }
   get aiBotList() {
@@ -64,6 +65,13 @@ export class AIService extends AbstractModule {
   }
 
   private aiBotMap: Map<number, AiBot> = new Map<number, AiBot>();
+
+  initialize(): void {
+    const bots = Locator.fetch(UserService).user?.bots;
+    if (bots) {
+      this.onGetAiBotListComplete(bots);
+    }
+  }
 
   public createAiBot(data: IAiBotCreateDef, cb?: Function) {
     AiApi.createAiBot(data, (data: IAiBotDef) => {
@@ -86,15 +94,11 @@ export class AIService extends AbstractModule {
     EventService.dispatchEvent(EventEnum.BOT_INIT_COMPLETE, this.aiBotList);
   };
 
-  public getBotById(id:number)
-  {
-    console.log(">>>>>>aibotMap",this.aiBotMap);
-    
+  public getBotById(id: number) {
     return this.aiBotMap.get(id);
   }
 
   getArticleBot(): AiBot | undefined {
-    console.log(">>>>>>>>>>>>>>>>初始化", this.aiBotMap.get(13));
     return this.getBotById(13);
   }
 }

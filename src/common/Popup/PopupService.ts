@@ -8,56 +8,52 @@ import { AbstractModule } from '../data/AbstractModule';
 export type DynamicComponentProps = any;
 
 export interface DynamicComponentState {
-  Component: FunctionComponent<DynamicComponentProps> ;
+  Component: FunctionComponent<DynamicComponentProps>;
   props: DynamicComponentProps | null;
 }
 
+export class PopupService {
+  popupList: DynamicComponentState[] = [];
+  popupSet: Set<FunctionComponent> = new Set();
 
+  public showPopup(component: any, props?: DynamicComponentProps): number {
+    console.log(component);
 
-export class PopupService extends AbstractModule
-{
-  popupList:DynamicComponentState[] = [];
-  popupSet:Set<FunctionComponent> = new Set()
+    props = props || {};
+    const popup = { Component: component, props: props };
+    this.popupList.push(popup);
+    console.log('Dispatch');
 
-  public showPopup(component:any,props?:DynamicComponentProps):number
-  {
-    props = props || {}
-    const popup = {Component:component,props:props}
-    this.popupList.push(popup)
-    EventService.dispatchEvent(EventEnum.POPUP_CHANGE, this.popupList)
-    return this.popupList.length
+    EventService.dispatchEvent(EventEnum.POPUP_CHANGE, this.popupList);
+    return this.popupList.length;
   }
 
-  public showPopupOnce(component:any,props?:DynamicComponentProps)
-  {
-    if(this.popupSet.has(component))
-      {
-        return;
-      }
-    this.showPopup(component,props)
-    this.popupSet.add(component)
+  public showPopupOnce(component: any, props?: DynamicComponentProps) {
+    console.log('>>>>>showPOponce');
+    if (this.popupSet.has(component)) {
+      return;
+    }
+    console.log('<<<<');
+
+    this.showPopup(component, props);
+    this.popupSet.add(component);
   }
 
-  public hidePopup(index?:number)
-  {
-    let component
-    if(index !== undefined)
-    {
-      const popup = this.popupList.splice(index,1)
-      if(popup.length>0)
-      {
-        component = popup[0].Component
-        this.popupSet.delete(component)
+  public hidePopup(index?: number) {
+    let component;
+    if (index !== undefined) {
+      const popup = this.popupList.splice(index, 1);
+      if (popup.length > 0) {
+        component = popup[0].Component;
+        this.popupSet.delete(component);
       }
-    }else{
-      const popup = this.popupList.pop()
-      if(popup != undefined)
-      {
-        component = popup.Component
-        this.popupSet.delete(component)
+    } else {
+      const popup = this.popupList.pop();
+      if (popup != undefined) {
+        component = popup.Component;
+        this.popupSet.delete(component);
       }
     }
-    EventService.dispatchEvent(EventEnum.POPUP_CHANGE,this.popupList)
+    EventService.dispatchEvent(EventEnum.POPUP_CHANGE, this.popupList);
   }
-
 }

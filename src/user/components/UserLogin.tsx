@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import useStore from '@store/store';
 import ReactDOM from 'react-dom';
 import { Locator } from '@src/common/data/Locator';
-import { UserService, UserStateEnum } from '@src/user/mgr/UserService';
+import { UserService } from '@src/user/mgr/UserService';
 import { PopupService } from '@src/common/Popup/PopupService';
 
 const UserLogin = () => {
@@ -13,25 +13,21 @@ const UserLogin = () => {
   const userToken = useStore((state) => state.userToken);
   const [isLogin, setIsLogin] = useState(true);
   const userService = Locator.fetch(UserService)
+
+  console.log("><>>>>>userlogin");
+
   const handleLogin = async () => {
-    userService.login(username, password,function(){
-      // 关闭模态框
-      Locator.fetch(PopupService).hidePopup()
-    })
+    userService.login(username, password)
   };
 
   const handleRegister = async () => {
 
-    userService.register(username, password,email, function(){
+    userService.register(username, password, email, function () {
       setIsLogin(true);
     })
   }
 
-  const handleClose = function(){
-    Locator.fetch(PopupService).hidePopup()
-  }
-
-  const register = function(){
+  const register = function () {
     setIsLogin(false);
   }
 
@@ -40,7 +36,7 @@ const UserLogin = () => {
     <div className='fixed top-0 left-0 z-[999] w-full p-4 overflow-x-hidden overflow-y-auto h-full flex justify-center items-center'>
       <div className="container max-w-lg max-auto grid  bg-gray-600 border-2 px-14 border-gray-400 rounded-xl p-8">
         <div className="h-10 text-center">
-          <h2 className=" text-2xl text-gray-300 font-bold mb-4">{isLogin?"login":"register"}</h2>
+          <h2 className=" text-2xl text-gray-300 font-bold mb-4">{isLogin ? "login" : "register"}</h2>
         </div>
         <div>
           <div className="mb-4">
@@ -55,7 +51,7 @@ const UserLogin = () => {
               onChange={(event) => setUsername(event.target.value)}
             />
           </div>
-          {isLogin==false && <div className={"mb-4"} >
+          {isLogin == false && <div className={"mb-4"} >
             <label htmlFor="email" className="text-gray-700">
               邮箱地址：
             </label>
@@ -90,25 +86,24 @@ const UserLogin = () => {
             <div className="col-start-2 flex justify-center">
               <button
                 type={"submit"}
-                onClick={isLogin? handleLogin:handleRegister}
+                onClick={isLogin ? handleLogin : handleRegister}
                 className="bg-slate-700 text-white py-2 px-4 rounded-md hover:bg-slate-800 focus:outline-none focus:bg-slate-800"
               >
-                {isLogin?"Login":"Register"}
+                {isLogin ? "Login" : "Register"}
               </button>
             </div>
             <div className="flex justify-center">
-              <button onClick={handleClose} className="bg-slate-700 text-white py-2 px-4 rounded-md hover:bg-slate-800 focus:outline-none focus:bg-slate-800">
+              {/* <button onClick={handleClose} className="bg-slate-700 text-white py-2 px-4 rounded-md hover:bg-slate-800 focus:outline-none focus:bg-slate-800">
                 Cancel
-              </button>
+              </button> */}
             </div>
           </div>
         </div>
       </div>
       <div className='bg-gray-800/90 absolute top-0 left-0 h-full w-full z-[-1]'
-           onClick={handleClose}
       />
     </div>
-    ,document.getElementById('modal-root') as HTMLElement)
+    , document.getElementById('modal-root') as HTMLElement)
   );
 };
 export default UserLogin;

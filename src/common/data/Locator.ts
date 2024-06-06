@@ -1,13 +1,6 @@
-import { IModule } from '@src/common/data/Modules';
-
-
-
-
-
 export class Locator {
   private static instances: Map<string, any> = new Map();
-  public static register<T>(classRef: new () => T, module:IModule):void
-  {
+  public static register<T>(classRef: new () => T, module: any): void {
     const className = classRef.name;
     // 检查实例是否已经存在于Map中
     if (!this.instances.has(className)) {
@@ -16,8 +9,7 @@ export class Locator {
     }
   }
 
-  public static unregister<T>(classRef: new () => T):void
-  {
+  public static unregister<T>(classRef: new () => T): void {
     const className = classRef.name;
     // 检查实例是否已经存在于Map中
     if (this.instances.has(className)) {
