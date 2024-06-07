@@ -1,4 +1,3 @@
-import { IModule } from '@src/common/System/Modules';
 import { getClientError, handleErrorStatus } from '@utils/api';
 import me from '@components/Menu/MenuOptions/Me';
 import { Locator } from '@src/common/System/Locator';
@@ -156,7 +155,7 @@ export class StreamRpcRequest extends AbstractRpc {
     super(path, method, body, header);
     this.token = Locator.fetch(UserService).accessToken;
     this.onData = onData;
-    this.onEnd = onEnd ? onEnd : () => {};
+    this.onEnd = onEnd ? onEnd : () => { };
     this.onError = onError ? onError : this.onError;
   }
 

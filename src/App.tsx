@@ -4,7 +4,7 @@ import i18n from './i18n'; // 导入国际化配置文件
 import Menu from '@components/Menu'; // 导入菜单组件
 import { ChatInterface } from '@type/chat'; // 导入聊天接口类型
 import { Theme } from '@type/theme'; // 导入主题类型
-import UserInfo from '@src/user/components/UserInfo';
+import ToolsBox from '@src/tools_box/ToolsBox';
 import { Locator } from './common/System/Locator';
 import { UserService } from './user/mgr/UserService';
 import { EventEnum } from './common/Event/EventEnum';
@@ -43,7 +43,7 @@ function App() {
                 {currentAiBot && <Chat currentAiBot={currentAiBot} />}
               </div>
             </div>}
-          {curTab?.index === 2 && <UserInfo />}
+          {curTab?.index === 2 && <ToolsBox />}
           {curTab?.index === 3 && <EnglishWordMain />}
         </main>
       </div>

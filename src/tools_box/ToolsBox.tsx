@@ -6,34 +6,18 @@ import PopupModal from '@components/PopupModal';
 import { availableEndpoints, defaultAPIEndpoint } from '@constants/auth';
 import DownChevronArrow from '@icon/DownChevronArrow';
 import ReactDOM from 'react-dom';
+import ExcelSearch from './ExcelSearch';
 
 
-const UserInfo = () => {
-  const user = {
-    name: 'John',
-    age: 25,
-    gender: 'Male',
-    address: '123 Main St, City',
-    phone: '123-456-7890',
-    email: 'john@example.com',
-    occupation: 'Software Engineer',
-    education: 'Bachelor of Science',
-    avatar: 'https://randomuser.me/api/portraits'
-
-  };
+const ToolsBox = () => {
   const [activeTab, setActiveTab] = useState('profile');
-
   const handleTabChange = ({ tab }: { tab: any }) => {
     setActiveTab(tab);
   };
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="bg-white rounded-lg shadow-md">
-        <div className="flex items-center p-6 border-b">
-          <img src={user.avatar} alt="Avatar" className="h-12 w-12 rounded-full mr-4" />
-          <h2 className="text-2xl font-bold">{user.name}</h2>
-        </div>
+      <div className="bg-gray-800 rounded-lg shadow-md">
         <div className="flex items-center justify-center py-4">
           <ul className="flex border-b">
             <TabItem title="个人资料" activeTab={activeTab} onClick={() => handleTabChange({ tab: 'profile' })} />
@@ -43,9 +27,10 @@ const UserInfo = () => {
           </ul>
         </div>
         <div className="p-6">
-          {activeTab === 'profile' && <ProfileTab user={user} />}
-          {activeTab === 'history' && <HistoryTab />}
-          {activeTab === 'articles' && <ArticlesTab />}
+          <ExcelSearch></ExcelSearch>
+          {/* {activeTab === 'profile' && }
+          {activeTab === 'history' && }
+          {activeTab === 'articles' &&} */}
           {/* Render content for other tabs */}
         </div>
       </div>
@@ -53,7 +38,7 @@ const UserInfo = () => {
   );
 };
 
-const TabItem = ({ title, activeTab, onClick }:{title:string,activeTab:string,onClick:any}) => {
+const TabItem = ({ title, activeTab, onClick }: { title: string, activeTab: string, onClick: any }) => {
   return (
     <li className={` bg-slate-200 cursor-pointer border-b-4 border-blue-500 hover:bg-slate-400 rounded-sm p-2 mx-2`} onClick={onClick}>
       {title}
@@ -61,7 +46,7 @@ const TabItem = ({ title, activeTab, onClick }:{title:string,activeTab:string,on
   );
 };
 
-const ProfileTab = ({ user }:{user:any}) => {
+const ProfileTab = ({ user }: { user: any }) => {
   return (
     <div>
       <p className="mb-4"><span className="font-medium">年龄:</span> {user.age}</p>
@@ -94,4 +79,4 @@ const ArticlesTab = () => {
   );
 };
 
-export default UserInfo;
+export default ToolsBox;

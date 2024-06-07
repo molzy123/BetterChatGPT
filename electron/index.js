@@ -2,9 +2,7 @@ const {
   app,
   dialog,
 } = require('electron');
-const WindowFactory = require("./WindowFactory.cjs");
-const ExcelUtil = require("./table/ExcelUtil.cjs");
-const ExcelMgr = require('./table/ExcelMgr.cjs');
+const WindowFactory = require("./WindowFactory.js");
 let win = null;
 let alert = null;
 const instanceLock = app.requestSingleInstanceLock();
@@ -18,7 +16,6 @@ app.on('window-all-closed', () => {
   }
 });
 
-ExcelMgr.init();
 process.on('uncaughtException', (error) => {
   // Perform any necessary cleanup tasks here
   dialog.showErrorBox('An error occurred', error.stack);

@@ -17,11 +17,12 @@ const isDev = require('electron-is-dev');
 const { autoUpdater } = require('electron-updater');
 const { log } = require("node:console");
 const { load } = require("@dqbd/tiktoken/load");
-
+const ExcelMgr = require("./table/ExcelMgr.cjs");
 const PORT = isDev ? '5173' : '51735';
 const ICON = 'icon-rounded.png';
 const ICON_TEMPLATE = 'iconTemplate.png';
 const isMacOS = process.platform === 'darwin';
+
 module.exports = {
     createServer() {
         const PORT = isDev ? '5174' : '51735'; // 使用不同的端口避免冲突
@@ -105,6 +106,36 @@ module.exports = {
         // if (isDev) {
 
         // }
+        ipcMain.on("MainWin", (event, body) => {
+            if (body.action == "openFile") {
+                var filePath = body.arg
+                // 判断是否是Excel文件，如果是则使用Excel打开
+                if (filePath.endsWith('.xlsm') || filePath.endsWith('.xlsx')) {
+                    // 使用默认程序打开文件
+                    shell.openPath(filePath);
+                }
+            } else if (body.action == "getExcelFiles") {
+                // 获取指定目录下的所有Excel文件
+                const ExcelUtil = require("./table/ExcelUtil.cjs");
+                ExcelUtil.getExcelFiles(body.arg).then(files => {
+                    event.sender.send("MainWin", { action: "getExcelFiles", arg: files });
+                });
+            }
+
+
+        });
+
+        ipcMain.handle("MainWinCall", async (event, body) => {
+            if (body.action == "getExcelFiles") {
+                // 获取指定目录下的所有Excel文件
+                const ExcelUtil = require("./table/ExcelUtil.cjs");
+                var result = await ExcelUtil.getExcelFiles(body.arg)
+                return result;
+            } else if (body.action == "searchSheet") {
+                var result = ExcelMgr.searchSheet(body.arg);
+                return result;
+            }
+        });
         this.setupLinksLeftClick(win);
         this.setupContextMenu(win);
         return win;

@@ -1,33 +1,62 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "useDefineForClassFields": true,
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "allowJs": false,
-    "skipLibCheck": true,
-    "esModuleInterop": false,
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "module": "ESNext",
-    "moduleResolution": "Node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react-jsx",
-    "baseUrl": ".",
-    "paths": {
-      "@icon/*": ["./src/assets/icons/*"],
-      "@type/*": ["./src/types/*"],
-      "@store/*": ["./src/store/*"],
-      "@hooks/*": ["./src/hooks/*"],
-      "@constants/*": ["./src/constants/*"],
-      "@api/*": ["./src/api/*"],
-      "@components/*": ["./src/components/*"],
-      "@utils/*": ["./src/utils/*"],
-      "@src/*": ["./src/*"]
+    "target": "ESNext", // 指定ECMAScript目标版本
+    "useDefineForClassFields": true, // 使用ECMAScript的私有字段语法
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ESNext"
+    ], // 指定要包含在编译中的库文件
+    "allowJs": false, // 允许编译JavaScript文件
+    "skipLibCheck": true, // 跳过所有声明文件(*.d.ts)的类型检查
+    "esModuleInterop": false, // 启用CommonJS和ES模块之间的互操作性
+    "allowSyntheticDefaultImports": true, // 允许从没有设置默认导出的模块中导入
+    "strict": true, // 启用所有严格类型检查选项
+    "forceConsistentCasingInFileNames": true, // 强制文件名一致性
+    "module": "ESNext", // 指定生成哪个模块系统代码
+    "moduleResolution": "Node", // 决定如何解析模块
+    "resolveJsonModule": true, // 允许json文件作为模块导入
+    "isolatedModules": true, // 确保每个文件可以单独编译
+    "noEmit": true, // 不生成编译文件
+    "jsx": "react-jsx", // 在.tsx文件中支持JSX
+    "baseUrl": ".", // 解析非相对模块名的基本目录
+    "paths": { // 模块名到基于baseUrl的路径映射的列表
+      "@icon/*": [
+        "./src/assets/icons/*"
+      ],
+      "@type/*": [
+        "./src/types/*"
+      ],
+      "@store/*": [
+        "./src/store/*"
+      ],
+      "@hooks/*": [
+        "./src/hooks/*"
+      ],
+      "@constants/*": [
+        "./src/constants/*"
+      ],
+      "@api/*": [
+        "./src/api/*"
+      ],
+      "@components/*": [
+        "./src/components/*"
+      ],
+      "@utils/*": [
+        "./src/utils/*"
+      ],
+      "@src/*": [
+        "./src/*"
+      ]
     }
   },
-  "include": ["src", "electron/index.cjs"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": [
+    "src",
+    "electron/index.cjs"
+  ], // 要包含在编译中的文件或目录列表
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ] // 项目引用路径列表
 }
