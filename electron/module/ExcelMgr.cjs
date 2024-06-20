@@ -1,13 +1,10 @@
 const XLSX = require('xlsx');
-const path = require('path');
-const fs = require('fs-extra');
-const crypto = require('crypto');
 const ExcelUtil = require("./ExcelUtil.cjs");
 
 module.exports = {
     excelList: [],
     async init() {
-        var files = await ExcelUtil.getExcelFiles("E:/work_space/zhenyulin_FCM_Dev_Next/shared-S4-global/excel");
+        var files = await ExcelUtil.getExcelFiles("E:/work_space/zhenyulin_FCM_Dev_Next/shared-S4-global/excel/PlayerExchange/");
         for (let file of files) {
             var excel = XLSX.readFile(file.filePath);
             this.excelList.push({ filePath: file.filePath, sheets: excel.SheetNames });
